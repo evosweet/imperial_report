@@ -1,5 +1,5 @@
 import falcon,json,ast,requests
-import os,sys
+import os, sys
 import uuid
 import mimetypes
 sys.path.append('..')
@@ -26,7 +26,7 @@ class CreateIncident(object):
         try:
             data = ast.literal_eval(req.stream.read(req.content_length or 0))
             if data:
-                report_id = DBUtil().add_record(data)
+                report_id = DBUtil().add_incident(data)
                 if report_id:
                     resp.status = falcon.HTTP_200
                     resp.content_type = CONTENT_TYPE
