@@ -1,6 +1,7 @@
 import pymysql
 import ConfigParser
 import ast
+import datetime
 
 
 class DBUtil():
@@ -24,19 +25,27 @@ class DBUtil():
     def add_record(self, params):
         try:
             con = self.connect()
-            print "his"
             sql = self.getConfig('sql')['add_incident']
+            dt_reported = datetime.datetime.now()
+
+            if 'dt_occured' not in params:
+                params['dt_occured'] = dt_reported
+            if 'contact_no' not in params:
+                params['contact_no'] = None
+            if 'path' not in params:
+                params['path'] = None
+            if 'email' not in params:
+                params['email'] = None
 
             with con.cursor() as cur:
-                print "hi"
                 cur.execute(sql, (params['description'], params['location'],
-                    params['event_id'], params['dt_reported'], params['dt_occured'], params['contact_email'], params['contact_no'], params['path'], params['statusid'],))
-                print con.insert_id
+                    params['event_id'], dt_reported, params['dt_occured'], params['email'], params['contact_no'], params['path'],))
                 con.commit()
+                return con.insert_id()
         except Exception as identifier:
             print identifier,"error"
 
 db = DBUtil()
-params = {'description': 'SOMETHING SOMETHING BLAH BLAH BLAH', 'location': 'KINGSTON', 'dt_reported': '2016-11-04 17:24:00', 'event_id': 1}
+params = {'description': 'SOMETHING SOMETHING BLAH BLAH BLAH', 'location': 'KINGSTON', 'dt_reported': '2016-11-04 17:24:00', 'email':'email@mail.com', 'event_id': 1}
 # print params
 db.add_record(params)
