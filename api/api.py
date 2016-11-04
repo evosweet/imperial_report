@@ -1,8 +1,9 @@
 import falcon,json,ast,requests
-import os
+import os,sys
 import uuid
 import mimetypes
-
+sys.path.append('..')
+from db.db import DBUtil
 
 CONTENT_TYPE = 'application/json'
 RESP = {'msg':''}
@@ -23,11 +24,18 @@ class Index(object):
 class CreateIncident(object):
     def on_post(self, req, resp):
         try:
-            data = req.stream.read(req.content_length or 0)
-            print data
-            resp.status = falcon.HTTP_200
-            resp.content_type = CONTENT_TYPE
-            resp['msg'] = "The end is nigh"
+            data = ast.literal_eval(req.stream.read(req.content_length or 0))
+            if data:
+                report_id = DBUtil().add_record(data)
+                if report_id:
+                    resp.status = falcon.HTTP_200
+                    resp.content_type = CONTENT_TYPE
+                    RESP['msg'] = {"reference_no":report_id}
+                else:
+                    resp.status = falcon.HTTP_500
+                    RESP['msg'] = "An ERROR Occured"
+            else:
+                RESP['msg'] = "we jamming"
         except Exception as identifier:
             resp.status = falcon.HTTP_500
             RESP['msg'] = identifier.message
