@@ -26,21 +26,9 @@ export class ReportFormComponent {
             {'id': 14, 'event': 'WATER OUTAGE'},
             {'id': 15, 'event': 'VANDALISM'}
         ]
-    model = new Report(this.events[0].event, '', '', '');
-   
-   active = true;
-   imgActive = true;
-   submitted = false;
+    model = new Report(this.events[0].event,'','');
 
     newReport() {
-        this.model = new Report(this.events[0].event, '', '' , '');
-        this.active = false;
-        setTimeout(() => this.active = true, 0);
-    }
-    onSubmit(){
-        this.submitted = true;
-    }
-    imgSubmit(){
-        alert("test 2")
+        this.model = new Report(this.events[0].event,'','');
     }
 }
