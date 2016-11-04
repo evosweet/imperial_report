@@ -1,5 +1,5 @@
-<div class="row" class="col-md-6 col-md-offset-3">
-    <nav class="navbar navbar-default">
+<div class="row" class="container">
+    <nav class="navbar navbar-default navbar-fixed-top">
          <div class="container-fluid">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
@@ -19,9 +19,16 @@
             </div>
          </div>
     </nav>
-    <div class="row" class="col-md-6 col-md-offset-3">
+    <div class="row" class="container top-buffer">
         <router-outlet></router-outlet>
     </div>
+    <div class="row">
+        <nav class="navbar navbar-default navbar-fixed-bottom">
+        <div class="container-fluid">
+            <h5>A Government of Guyana Project </h5>
+        </div>
+        </nav>
+   </div>
 </div>
 
 

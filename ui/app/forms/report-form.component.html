@@ -1,0 +1,28 @@
+<div class="container">
+     <form (ngSubmit)="onSubmit()" #reportForm="ngForm">
+         <div class="form-group">
+             <label for="eventType">Event Type</label>
+            <select class="form-control" id="eventType" required [(ngModel)]="model.eventType" name="eventType" #eventType="ngModel">
+                <option *ngFor="let e of events" [value]="e.id"> {{e.event}} </option>
+            </select>
+         </div> 
+          <div class="form-group">
+             <label for="location">Location</label>
+             <input type="text" class="form-control" id="location" required [(ngModel)]="model.location" name="location" #location="ngModel">
+         </div>
+         <div class="form-group">
+             <label for="description">Description</label>
+             <input type="textarea" rows="5" class="form-control" id="description" required [(ngModel)]="model.description" name="description" #description="ngModel">
+         </div>
+         <div class="form-group">
+             <label for="email">Email Address Optional</label>
+             <input type="text" class="form-control" id="email" [(ngModel)]="model.email" name="email" #email="ngModel">
+         </div>
+         <div class="form-group">
+             <label for="phoneNumber">Phone Number Optional</label>
+             <input type="text" class="form-control" id="phone" [(ngModel)]="model.phone" name="phone" #phone="ngModel">
+         </div>
+         <button type="button" class="btn btn-default" (click)="newReport()"> Clear Form </button>
+         <button type="submit" class="btn btn-default" [disabled]="!reportForm.form.valid"> Submit Report</button>
+     </form>
+</div>
