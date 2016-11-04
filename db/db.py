@@ -39,9 +39,9 @@ class DBUtil():
 
             with con.cursor() as cur:
                 cur.execute(sql, (params['description'], params['location'],
-                    params['event_id'], dt_reported, params['dt_occured'], params['email'], params['contact_no'], params['path'],))
+                    params['event_id'], dt_reported, params['dt_occured'], params['email'], params['contact_no'],))
+                    return con.insert_id()
                 con.commit()
-                return con.insert_id()
         except Exception as identifier:
             print identifier,"error"
 
