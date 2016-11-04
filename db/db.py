@@ -22,7 +22,7 @@ class DBUtil():
         except Exception as identifier:
             pass
 
-    def add_record(self, params):
+    def add_incident(self, params):
         try:
             con = self.connect()
             sql = self.getConfig('sql')['add_incident']
@@ -45,7 +45,59 @@ class DBUtil():
         except Exception as identifier:
             print identifier,"error"
 
+    def get_incident(self, params):
+        try:
+            con = self.connect()
+            sql = self.getConfig('sql')['get_incident']
+
+            with con.cursor() as cur:
+                cur.execute(sql, (params['id'],))
+                for rec in cur.fetchall():
+                    print rec
+        except Exception as identifier:
+            print identifier,"error"
+
+    def get_incident_event(self, params):
+        try:
+            con = self.connect()
+            sql = self.getConfig('sql')['get_incident']
+
+            with con.cursor() as cur:
+                cur.execute(sql, (params['event_id'],))
+                for rec in cur.fetchall():
+                    print rec
+        except Exception as identifier:
+            print identifier,"error"
+
+
+    def get_incident(self, params):
+        try:
+            con = self.connect()
+            sql = self.getConfig('sql')['get_incident']
+
+            with con.cursor() as cur:
+                cur.execute(sql, '1')
+                for rec in cur.fetchall():
+                    print rec
+        except Exception as identifier:
+            print identifier,"error"
+
+    def get_incident(self, params):
+        try:
+            con = self.connect()
+            sql = self.getConfig('sql')['get_incident']
+
+            with con.cursor() as cur:
+                cur.execute(sql, '1')
+                for rec in cur.fetchall():
+                    print rec
+        except Exception as identifier:
+            print identifier,"error"
+
+
 db = DBUtil()
-params = {'description': 'SOMETHING SOMETHING BLAH BLAH BLAH', 'location': 'KINGSTON', 'dt_reported': '2016-11-04 17:24:00', 'email':'email@mail.com', 'event_id': 1}
+# params = {'description': 'SOMETHING SOMETHING BLAH BLAH BLAH', 'location': 'KINGSTON', 'dt_reported': '2016-11-04 17:24:00', 'email':'email@mail.com', 'event_id': 1}
 # print params
-db.add_record(params)
+params = {'event_id':'1'}
+# db.add_incident(params)
+db.get_incident_event(1)
