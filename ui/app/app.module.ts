@@ -1,16 +1,21 @@
 import { NgModule }      from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
+import { HttpModule } from '@angular/http';
 
 import { AppComponent }  from './app.component';
 import { HomeComponent } from './component/home.component';
 import { ReportFormComponent } from './forms/report-form.component';
+import { MyIncidentFormComponent } from './forms/my-Incident-form.component';
 
 import { AppRoutingModule, routingComponents } from './app.routing';
+import { ReportService } from './_service/report.service';
 
 @NgModule({
-  imports:      [ BrowserModule, AppRoutingModule, FormsModule],
-  declarations: [ AppComponent, routingComponents , HomeComponent, ReportFormComponent ],
+  imports:      [ BrowserModule, AppRoutingModule, FormsModule, HttpModule],
+  declarations: [ AppComponent, routingComponents , HomeComponent,
+                  ReportFormComponent, MyIncidentFormComponent ],
+  providers: [ ReportService ],
   bootstrap:    [ AppComponent ]
 })
 export class AppModule { }

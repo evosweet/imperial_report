@@ -2,7 +2,7 @@
      <form (ngSubmit)="onSubmit()" #reportForm="ngForm" *ngIf="active">
          <div class="form-group">
              <label for="eventType">Event Type</label>
-            <select class="form-control" id="eventType" required [(ngModel)]="model.eventType" name="eventType" #eventType="ngModel">
+            <select class="form-control" id="eventType" required [(ngModel)]="model.event_id" name="event_id" #eventType="ngModel">
                 <option *ngFor="let e of events" [value]="e.id"> {{e.event}} </option>
             </select>
          </div> 
@@ -22,7 +22,25 @@
              <label for="phoneNumber">Phone Number Optional</label>
              <input type="text" class="form-control" id="phone" [(ngModel)]="model.phone" name="phone" #phone="ngModel">
          </div>
+         <div class="form-group">
+             <label for="reportDate">Report Date Optional</label>   
+             <input type="date" id="reportDate" class="form-control" [(ngModel)]="model.reportDate" name="reportDate" #reportDate="ngModel">
+         </div>
          <button type="button" class="btn btn-default" (click)="newReport()"> Clear Form </button>
          <button type="submit" class="btn btn-default" [disabled]="!reportForm.form.valid"> Submit Report</button>
      </form>
+</div>
+<div class="container top-buffer" [hidden]="submitted">
+    <form (ngSubmit)="onUpload()" #uploadForm="ngForm">
+        <div class="form-group">    
+           <label for="report_id">Report ID</label>
+           <input type="text" class="form-control" id="report_id" required [(ngModel)]="imageModel.id" name="report_id" #location="ngModel" value={{subResult.reference_no}}>
+        </div>
+        <div class="form-group">
+            <span class="btn btn-default btn-file">
+               <input type="file" (change)="onChange($event)" required/>
+            </span>
+        </div>
+        <button type="submit" class="btn btn-default" [disabled]="!uploadForm.form.valid"> Upload File</button>
+    </form>
 </div>
