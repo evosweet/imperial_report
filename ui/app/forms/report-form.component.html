@@ -1,18 +1,19 @@
 <div class="container" [hidden]="submitted">
      <form (ngSubmit)="onSubmit()" #reportForm="ngForm" *ngIf="active">
          <div class="form-group">
-             <label for="eventType">Event Type</label>
+            <label for="eventType">Event Type</label>
             <select class="form-control" id="eventType" required [(ngModel)]="model.event_id" name="event_id" #eventType="ngModel">
                 <option *ngFor="let e of events" [value]="e.id"> {{e.event}} </option>
             </select>
          </div> 
           <div class="form-group">
-             <label for="location">Location</label>
-             <input type="text" class="form-control" id="location" required [(ngModel)]="model.location" name="location" #location="ngModel">
+             <label for="location">Location  minimum  10 characters</label>
+             <input type="text" class="form-control" id="location" required [(ngModel)]="model.location" name="location" #location="ngModel" pattern=".{10,}">
          </div>
          <div class="form-group">
-             <label for="description">Description</label>
-             <input type="textarea" rows="5" class="form-control" id="description" required [(ngModel)]="model.description" name="description" #description="ngModel">
+             <label for="description">Description minimum  40 characters</label>
+             <textarea type="text" rows="3" class="form-control" id="description" required 
+              [(ngModel)]="model.description" name="description" #description="ngModel" pattern=".{40,}"> </textarea>
          </div>
          <div class="form-group">
              <label for="email">Email Address Optional</label>
@@ -34,7 +35,7 @@
     <form (ngSubmit)="onUpload()" #uploadForm="ngForm">
         <div class="form-group">    
            <label for="report_id">Report ID</label>
-           <input type="text" class="form-control" id="report_id" required [(ngModel)]="imageModel.id" name="report_id" #location="ngModel" value={{subResult.reference_no}}>
+           <input type="text" class="form-control" id="report_id" required [(ngModel)]="imageModel.id" name="report_id" #location="ngModel">
         </div>
         <div class="form-group">
             <span class="btn btn-default btn-file">

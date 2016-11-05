@@ -31,6 +31,16 @@ export class ReportService {
          .then(this.extractData)
          .catch(this.handleError);
     }
+    mySearch(searchType: string, value: string | number) {
+        console.log(searchType);
+        console.log(value);
+        let headers = new Headers({'Content-Type': 'application/json'});
+        let body = JSON.stringify({'searchType': searchType, 'value': value});
+        return this.http.post(this.report_url + '/get_incident', body, {headers: headers})
+         .toPromise()
+         .then(this.extractData)
+         .catch(this.handleError);
+    }
     extractData(res: Response) {
         let body = res.json();
         return body;
@@ -39,3 +49,5 @@ export class ReportService {
         return error.json();
     }
 }
+
+//get_incident

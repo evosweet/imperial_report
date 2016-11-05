@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { Report } from '../model/report';
 import { Image } from '../model/image';
+import {  ReportMake } from '../model/reportMake';
 import { ReportService } from '../_service/report.service';
 
 
@@ -11,7 +12,7 @@ import { ReportService } from '../_service/report.service';
 })
 export class ReportFormComponent {
     active = true;
-    subResult = {};
+    subResult: ReportMake;
     submitted = false;
     fileStatus = false;
     events = [
@@ -24,15 +25,15 @@ export class ReportFormComponent {
             {'id': 7, 'event': 'POT HOLES'},
             {'id': 8, 'event': 'HOMICIDE'},
             {'id': 9, 'event': 'SUSPICIOUS ACTIVITY'},
-            {'id': 10, 'event': 'OTHER'},
             {'id': 11, 'event': 'FLOODING'},
             {'id': 12, 'event': 'ACCIDENTS'},
             {'id': 13, 'event': 'DEATH'},
             {'id': 14, 'event': 'WATER OUTAGE'},
-            {'id': 15, 'event': 'VANDALISM'}
+            {'id': 15, 'event': 'VANDALISM'},
+            {'id': 10, 'event': 'OTHER'},
         ]
     model = new Report(this.events[0].event, this.events[0].id , '', '');
-    imageModel = new Image(0,'');
+    imageModel = new Image(0, '');
     constructor(private reportservice: ReportService, ) {}
     newReport() {
         this.model = new Report(this.events[0].event, this.events[0].id , '', '');
@@ -41,7 +42,6 @@ export class ReportFormComponent {
          this.submitted = false;
     }
     onSubmit() {
-        this.subResult = {};
         this.reportservice.makeReport(this.model.event_id, this.model.location, this.model.description,
         this.model.phone, this.model.email, this.model.reportDate)
         .then( result => {
@@ -50,10 +50,12 @@ export class ReportFormComponent {
             } else {
                 this.submitted = true;
                 this.subResult = result.msg;
+                this.imageModel.id = result.msg.reference_no;
             }
         });
     }
     onUpload() {
+        this.imageModel.id = this.subResult.reference_no;
         this.reportservice.uploadImg(this.imageModel.id, this.imageModel.file)
         .then( result => {
              if (result.result === 'ERROR') {
@@ -71,6 +73,7 @@ export class ReportFormComponent {
         this.fileStatus = false;
     }
     onChange($event: any): void {
+         this.fileStatus = false;
          var inputValue = $event.target;
          this.imageModel.file = inputValue.files[0];
     }
