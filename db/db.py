@@ -179,3 +179,16 @@ class DBUtil():
             return incidents
         except Exception as identifier:
             print identifier, "error"
+
+    def get_event_by_id(self, params):
+        try:
+            con = self.connect()
+            sql = self.getConfig('sql')['get_event_by_id']
+            with con.cursor() as cur:
+                cur.execute(sql, (params['id'],))
+                rows = cur.fetchall()
+                for rec in rows:
+                    event = rec[0]
+            return event
+        except Exception as identifier:
+            print identifier, "error"
