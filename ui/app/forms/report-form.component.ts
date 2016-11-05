@@ -9,6 +9,7 @@ import { Event } from '../model/event';
     templateUrl: `report-form.component.html`
 })
 export class ReportFormComponent {
+    active = true;
     events = [
             {'id': 1, 'event': 'Fire'},
             {'id': 2, 'event':  'DOMESTIC VIOLENCE'},
@@ -30,5 +31,10 @@ export class ReportFormComponent {
 
     newReport() {
         this.model = new Report(this.events[0].event,'','');
+        this.active = false;
+        setTimeout(() => this.active = true, 0);
+    }
+    onSubmit(){
+        alert("test");
     }
 }

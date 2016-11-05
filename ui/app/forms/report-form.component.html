@@ -1,5 +1,5 @@
 <div class="container">
-     <form (ngSubmit)="onSubmit()" #reportForm="ngForm">
+     <form (ngSubmit)="onSubmit()" #reportForm="ngForm" *ngIf="active">
          <div class="form-group">
              <label for="eventType">Event Type</label>
             <select class="form-control" id="eventType" required [(ngModel)]="model.eventType" name="eventType" #eventType="ngModel">
@@ -16,7 +16,7 @@
          </div>
          <div class="form-group">
              <label for="email">Email Address Optional</label>
-             <input type="text" class="form-control" id="email" [(ngModel)]="model.email" name="email" #email="ngModel">
+             <input type="email" class="form-control" id="email" [(ngModel)]="model.email" name="email" #email="ngModel">
          </div>
          <div class="form-group">
              <label for="phoneNumber">Phone Number Optional</label>
