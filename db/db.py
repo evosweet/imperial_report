@@ -57,8 +57,11 @@ class DBUtil():
                 cur.execute(sql, (params['id'],))
                 for rec in cur.fetchall():
                     # incident = {'id': rec[1], 'name': rec[2], 'desc': rec[3], 'email': rec[4], 'person_of_contact': rec[5], 'phone': rec[6], 'address': rec[7], 'website': rec[8]}
-                    incident = {'id': rec[0], 'description': rec[1], 'location': rec[2], 'event_type': rec[3], 'dt_reported': str(rec[4]), 'dt_occured': str(rec[5]), 'contact_email': rec[6], 'status': rec[7], 'auth': rec[8], 'auth_id': rec[9],'images':images}
-                    # incident = {'id': rec[0], 'description': rec[1], 'location': rec[2], 'dt_reported': str(rec[3]), 'event_id': rec[4], 'dt_occured': str(rec[5]), 'contact_email': rec[6], 'contact_no': rec[7], 'has_image': rec[8], 'status_id': rec[9], 'images':images}
+                    incident = {'id': rec[0], 'description': rec[1], 'location': rec[2], 'event_type': rec[3], 'dt_reported': str(rec[4]), 'dt_occured': str(rec[5]), 'contact_email': rec[6], 'status': rec[7], 'auth': rec[8], 'auths': [], 'images': []}
+                    images = self.get_incident_image(incident)
+                    auths = self.get_incident_auth(incident)
+                    incident['images'] = images
+                    incident['auths'] = auths
                     incidents.append(incident)
             return incidents
         except Exception as identifier:
@@ -73,7 +76,11 @@ class DBUtil():
                 cur.execute(sql, (params['event_id'],))
                 rows = cur.fetchall()
                 for rec in rows:
-                    incident = {'id': rec[0], 'description': rec[1], 'location': rec[2], 'event_type': rec[3], 'dt_reported': str(rec[4]), 'dt_occured': str(rec[5]), 'contact_email': rec[6], 'status': rec[7], 'auth': rec[8], 'auth_id': rec[9],'images':images}
+                    incident = {'id': rec[0], 'description': rec[1], 'location': rec[2], 'event_type': rec[3], 'dt_reported': str(rec[4]), 'dt_occured': str(rec[5]), 'contact_email': rec[6], 'status': rec[7], 'auths': [], 'images': []}
+                    images = self.get_incident_image(incident)
+                    auths = self.get_incident_auth(incident)
+                    incident['images'] = images
+                    incident['auths'] = auths
                     incidents.append(incident)
             return incidents
         except Exception as identifier:
@@ -82,15 +89,17 @@ class DBUtil():
     def get_incident_email(self, params):
         try:
             con = self.connect()
-            sql = self.getConfig('sql')['get_incident_by_mail']
+            sql = self.getConfig('sql')['get_incident_by_email']
             incidents = []
             with con.cursor() as cur:
                 cur.execute(sql, (params['contact_email'],))
                 rows = cur.fetchall()
                 for rec in rows:
-                    incident = {'id': rec[0], 'description': rec[1], 'location': rec[2], 'event_type': rec[3], 'dt_reported': str(rec[4]), 'dt_occured': str(rec[5]), 'contact_email': rec[6], 'status': rec[7], 'auth': rec[8], 'auth_id': rec[9],'images':[]}
+                    incident = {'id': rec[0], 'description': rec[1], 'location': rec[2], 'event_type': rec[3], 'dt_reported': str(rec[4]), 'dt_occured': str(rec[5]), 'contact_email': rec[6], 'status': rec[7], 'auths': [], 'images': []}
                     images = self.get_incident_image(incident)
+                    auths = self.get_incident_auth(incident)
                     incident['images'] = images
+                    incident['auths'] = auths
                     incidents.append(incident)
             return incidents
         except Exception as identifier:
@@ -105,7 +114,11 @@ class DBUtil():
                 cur.execute(sql, (params['status_id'],))
                 rows = cur.fetchall()
                 for rec in rows:
-                    incident = {'id': rec[0], 'description': rec[1], 'location': rec[2], 'event_type': rec[3], 'dt_reported': str(rec[4]), 'dt_occured': str(rec[5]), 'contact_email': rec[6], 'status': rec[7], 'auth': rec[8], 'auth_id': rec[9],'images':images}
+                    incident = {'id': rec[0], 'description': rec[1], 'location': rec[2], 'event_type': rec[3], 'dt_reported': str(rec[4]), 'dt_occured': str(rec[5]), 'contact_email': rec[6], 'status': rec[7], 'auths': [], 'images': []}
+                    images = self.get_incident_image(incident)
+                    auths = self.get_incident_auth(incident)
+                    incident['images'] = images
+                    incident['auths'] = auths
                     incidents.append(incident)
             return incidents
         except Exception as identifier:
@@ -142,12 +155,27 @@ class DBUtil():
         try:
             con = self.connect()
             sql = self.getConfig('sql')['get_incident_auth']
-            incidents = []
+            auths = []
             with con.cursor() as cur:
                 cur.execute(sql, (params['id'],))
                 for rec in cur.fetchall():
-                    incident = {'incident_id': rec[0], 'description': rec[1], 'location': rec[2], 'event_type': rec[3], 'dt_reported': str(rec[4]), 'dt_occured': str(rec[5]), 'contact_email': rec[6], 'status': rec[7], 'auth': rec[8], 'auth_id': rec[9],'images':images}
-                    incidents.append(incident)
+                    auth = {'auth': rec[0], 'auth_id': rec[1]}
+                    auths.append(auth)
                 return incidents
+        except Exception as identifier:
+            print identifier, "error"
+
+    def get_event_email(self, params):
+        try:
+            con = self.connect()
+            sql = self.getConfig('sql')['get_event_email']
+            emails = []
+            with con.cursor() as cur:
+                cur.execute(sql, (params['event_id'],))
+                rows = cur.fetchall()
+                for rec in rows:
+                    email = {'email': rec[0]}
+                    emails.append(email)
+            return incidents
         except Exception as identifier:
             print identifier, "error"
