@@ -40,8 +40,9 @@ class DBUtil():
             with con.cursor() as cur:
                 cur.execute(sql, (params['description'], params['location'],
                     params['event_id'], dt_reported, params['dt_occured'], params['email'], params['contact_no'],))
-                    return con.insert_id()
+                out =  con.insert_id()
                 con.commit()
+            print out
         except Exception as identifier:
             print identifier,"error"
 
@@ -69,35 +70,36 @@ class DBUtil():
         except Exception as identifier:
             print identifier,"error"
 
-
-    def get_incident(self, params):
+    def get_incident_status(self, params):
         try:
             con = self.connect()
             sql = self.getConfig('sql')['get_incident']
 
             with con.cursor() as cur:
-                cur.execute(sql, '1')
-                for rec in cur.fetchall():
-                    print rec
-        except Exception as identifier:
-            print identifier,"error"
-
-    def get_incident(self, params):
-        try:
-            con = self.connect()
-            sql = self.getConfig('sql')['get_incident']
-
-            with con.cursor() as cur:
-                cur.execute(sql, '1')
+                cur.execute(sql, (params['status_id'],))
                 for rec in cur.fetchall():
                     print rec
         except Exception as identifier:
             print identifier,"error"
 
 
-# db = DBUtil()
-# # params = {'description': 'SOMETHING SOMETHING BLAH BLAH BLAH', 'location': 'KINGSTON', 'dt_reported': '2016-11-04 17:24:00', 'email':'email@mail.com', 'event_id': 1}
-# # print params
+    def add_incident_image(self, params):
+        try:
+            con = self.connect()
+            sql = self.getConfig('sql')['add_incident_image']
+
+            with con.cursor() as cur:
+                cur.execute(sql, (params['incident_id'],params['image_path'],))
+                out =  con.insert_id()
+                con.commit()
+            print out
+        except Exception as identifier:
+            print identifier,"error"
+
+db = DBUtil()
+params = {'description': 'SOMETHING SOMETHING BLAH BLAH BLAH', 'location': 'KINGSTON', 'dt_reported': '2016-11-04 17:24:00', 'email':'email@mail.com', 'event_id': 1}
+# print params
 # params = {'event_id':'1'}
-# # db.add_incident(params)
-# db.get_incident_event(1)
+params = {'incident_id':'1', 'image_path':'/image.png'}
+db.add_incident_image(params)
+# db.get_incident_event(params)
