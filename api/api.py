@@ -1,9 +1,10 @@
-import falcon,json,ast,requests
+import falcon,json,ast,requests,socket
 import os, sys
 import uuid
 import mimetypes
 sys.path.append('..')
 from db.db import DBUtil
+from smtp.smtp import SendMail
 
 CONTENT_TYPE = 'application/json'
 RESP = {'msg':'','result': ''}
@@ -23,7 +24,18 @@ class Index(object):
             resp.data = json.dumps(RESP)
 
 class CreateIncident(object):
+    """creates incidents"""
+    def sendsocket(self, request):
+        """sends request to mail socket"""
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.connect(('localhost', 9088))
+        data = json.dumps(request).encode('utf-8')
+        sock.sendall(data)
+        print data
+        sock.close()
+
     def on_post(self, req, resp):
+        """"Post request"""
         try:
             data = ast.literal_eval(req.stream.read(req.content_length or 0))
             if data:
@@ -33,6 +45,7 @@ class CreateIncident(object):
                     resp.content_type = CONTENT_TYPE
                     RESP['msg'] = {"reference_no":report_id}
                     RESP['result'] = 'SUCCESS'
+
                 else:
                     resp.status = falcon.HTTP_500
                     RESP['msg'] = "An ERROR Occured"
@@ -47,13 +60,16 @@ class CreateIncident(object):
 
 
 class SaveIncidentImage(object):
+    """Saves images"""
     def __init__(self, storage_path):
         self.storage_path = storage_path
 
     def on_post(self, req, resp):
+        """post request"""
         try:
             ext = mimetypes.guess_extension(req.content_type) 
             incident_id = req.get_header("INCIDENT-ID")
+            print incident_id
             filename = '{uuid}{ext}'.format(uuid=uuid.uuid4(), ext=ext)
             image_path = os.path.join(self.storage_path, filename)
             with open(image_path, 'wb') as image_file:
@@ -62,13 +78,14 @@ class SaveIncidentImage(object):
                     if not chunk:
                         break
                     image_file.write(chunk)
-                DBUtil().add_incident_image({'image_path':filename,'incident_id':incident_id})
-                RESP['msg'] ="GOOD"
+                DBUtil().add_incident_image({'image_path':filename, 'incident_id': incident_id})
+                RESP['msg'] = "GOOD"
                 RESP['result'] = 'SUCCESS'
         except Exception as identifier:
             print identifier.message
         finally:
             resp.data = json.dumps(RESP)
+
 
 
 class GetIncidentImage(object):
@@ -77,15 +94,12 @@ class GetIncidentImage(object):
 
     def on_get(self, req, resp):
         try:
-            params = req.get_param('path')
+            params = req.get_param('name')
             if params:
                 try:
                     resp.content_type = 'image/png'
-                    print type(params)
                     image_path = os.path.join(self.storage_path, params)
-                    print image_path
-                    resp.stream = file(image_path, 'rb').read()
-                    resp.stream_len = os.path.getsize(image_path)
+                    resp.body = file(image_path, 'rb').read()
                 except IOError as identifier:
                     print identifier
                     resp.status = falcon.HTTP_200
