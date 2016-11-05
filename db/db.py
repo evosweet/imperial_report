@@ -48,18 +48,19 @@ class DBUtil():
 
     def get_incident(self, params):
         try:
+            images = []
+            images = self.get_incident_image(params)
             con = self.connect()
             sql = self.getConfig('sql')['get_incident']
-
+            incidents = []
             with con.cursor() as cur:
                 cur.execute(sql, (params['id'],))
                 for rec in cur.fetchall():
-                    # print rec
                     # incident = {'id': rec[1], 'name': rec[2], 'desc': rec[3], 'email': rec[4], 'person_of_contact': rec[5], 'phone': rec[6], 'address': rec[7], 'website': rec[8]}
-
-                    incident = {'id': rec[0], 'description': rec[1], 'location': rec[2], 'dt_reported': str(rec[3]), 'event_id': rec[4], 'dt_occured': str(rec[5]), 'contact_email': rec[6], 'contact_no': rec[7], 'has_image': rec[8], 'status_id': rec[9]}
-                    print incident
-                    return incident
+                    incident = {'id': rec[0], 'description': rec[1], 'location': rec[2], 'event_type': rec[3], 'dt_reported': str(rec[4]), 'dt_occured': str(rec[5]), 'contact_email': rec[6], 'status': rec[7], 'auth': rec[8], 'auth_id': rec[9],'images':images}
+                    # incident = {'id': rec[0], 'description': rec[1], 'location': rec[2], 'dt_reported': str(rec[3]), 'event_id': rec[4], 'dt_occured': str(rec[5]), 'contact_email': rec[6], 'contact_no': rec[7], 'has_image': rec[8], 'status_id': rec[9], 'images':images}
+                    incidents.append(incident)
+            return incidents
         except Exception as identifier:
             print identifier, "error"
 
@@ -72,7 +73,7 @@ class DBUtil():
                 cur.execute(sql, (params['event_id'],))
                 rows = cur.fetchall()
                 for rec in rows:
-                    incident = {'id': rec[0], 'description': rec[1], 'location': rec[2], 'dt_reported': str(rec[3]), 'event_id': rec[4], 'dt_occured': str(rec[5]), 'contact_email': rec[6], 'contact_no': rec[7], 'has_image': rec[8], 'status_id': rec[9]}
+                    incident = {'id': rec[0], 'description': rec[1], 'location': rec[2], 'event_type': rec[3], 'dt_reported': str(rec[4]), 'dt_occured': str(rec[5]), 'contact_email': rec[6], 'status': rec[7], 'auth': rec[8], 'auth_id': rec[9],'images':images}
                     incidents.append(incident)
             return incidents
         except Exception as identifier:
@@ -87,9 +88,9 @@ class DBUtil():
                 cur.execute(sql, (params['status_id'],))
                 rows = cur.fetchall()
                 for rec in rows:
-                    incident = {'id': rec[0], 'description': rec[1], 'location': rec[2], 'dt_reported': str(rec[3]), 'event_id': rec[4], 'dt_occured': str(rec[5]), 'contact_email': rec[6], 'contact_no': rec[7], 'has_image': rec[8], 'status_id': rec[9]}
+                    incident = {'id': rec[0], 'description': rec[1], 'location': rec[2], 'event_type': rec[3], 'dt_reported': str(rec[4]), 'dt_occured': str(rec[5]), 'contact_email': rec[6], 'status': rec[7], 'auth': rec[8], 'auth_id': rec[9],'images':images}
                     incidents.append(incident)
-            print incidents
+            return incidents
         except Exception as identifier:
             print identifier, "error"
 
@@ -111,10 +112,9 @@ class DBUtil():
             sql = self.getConfig('sql')['get_incident_image']
             images = []
             with con.cursor() as cur:
-                cur.execute(sql, (params['incident_id'],))
+                cur.execute(sql, (params['id'],))
                 rows = cur.fetchall()
                 for rec in rows:
-                    print rec
                     image = {'id': rec[0], 'incident_id': rec[1], 'image_path': rec[2]}
                     images.append(image)
             return images
@@ -129,20 +129,8 @@ class DBUtil():
             with con.cursor() as cur:
                 cur.execute(sql, (params['authority_id'],))
                 for rec in cur.fetchall():
-                    print rec
-                    incident = {'incident_id': rec[0], 'description': rec[1], 'location': rec[2], 'event_type': rec[3], 'dt_reported': str(rec[4]), 'dt_occured': str(rec[5]), 'contact_email': rec[6], 'status_id': rec[7], 'auth_name': rec[8]}
-                    print incident
+                    incident = {'incident_id': rec[0], 'description': rec[1], 'location': rec[2], 'event_type': rec[3], 'dt_reported': str(rec[4]), 'dt_occured': str(rec[5]), 'contact_email': rec[6], 'status': rec[7], 'auth': rec[8], 'auth_id': rec[9],'images':images}
                     incidents.append(incident)
-                print incidents
                 return incidents
         except Exception as identifier:
             print identifier, "error"
-db = DBUtil()
-# # params = {'description': 'SOMETHING SOMETHING BLAH BLAH BLAH',
-# # 'location': 'KINGSTON', 'dt_reported': '2016-11-04 17:24:00', 'email':'email@mail.com', 'event_id': 1}
-# # print params
-params = {'authority_id': '16'}
-# # params = {'incident_id':'1', 'image_path':'/image.png'}
-# # params = {'id':'1', 'image_path':'/image.png'}
-# db.get_incident_image(params)
-db.get_incident_auth(params)
