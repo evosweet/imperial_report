@@ -208,36 +208,27 @@ class DBUtil():
             if 'email' not in params:
                 params['email'] = None
             with con.cursor() as cur:
-                cur.execute(sql, (params['incident_id'], params['comment'], dt, params['user_id']))
-                feedback = con.insert_id()
+                cur.execute(sql, (params['incident_id'], params['comment'], dt, params['user_id'],))
+                feedback_id = con.insert_id()
                 con.commit()
-            return incident_id
+            return feedback_id
         except Exception as identifier:
             print identifier, "error"
 
-    def get_feedback(self, params):
+    def get_feedbacks(self, params):
         try:
             feedbacks = []
-            images = self.get_incident_image(params)
             con = self.connect()
-            sql = self.getConfig('sql')['get_incident']
-            incidents = []
+            sql = self.getConfig('sql')['get_feedback']
+            feedbacks = []
             with con.cursor() as cur:
-                cur.execute(sql, (params['id'],))
+                cur.execute(sql, (params['incident_id'],))
                 for rec in cur.fetchall():
-                    # incident = {'id': rec[1], 'name': rec[2], 'desc': rec[3], 'email': rec[4], 'person_of_contact': rec[5], 'phone': rec[6], 'address': rec[7], 'website': rec[8]}
-                    incident = {'id': rec[0], 'description': rec[1], 'location': rec[2], 'event_type': rec[3], 'dt_reported': str(rec[4]), 'dt_occured': str(rec[5]), 'contact_email': rec[6], 'status': rec[7], 'auth': rec[8], 'auths': [], 'images': []}
-                    images = self.get_incident_image(incident)
-                    auths = self.get_incident_auth(incident)
-                    incident['images'] = images
-                    incident['auths'] = auths
-                    incidents.append(incident)
-            return incidents
+                    feedback = {'id': rec[0], 'incident_id': rec[1], 'comment': rec[2], 'dt': str(rec[3]), 'user': rec[4]}
+                    feedbacks.append(feedback)
+            return feedbacks
         except Exception as identifier:
             print identifier, "error"
-
-
-
 
 
     def hash_pw(self, password):
@@ -267,7 +258,7 @@ class DBUtil():
             #     params['email'] = None
 
             with con.cursor() as cur:
-                cur.execute(sql, (params['username'], params['pw'], params['level'], params['created_by'], params['dt_created'],))
+                cur.execute(sql, (params['username'], params['pw'], params['level'], params['created_by'], params['dt_created'], params['auth_id'],))
                 user_id = con.insert_id()
                 con.commit()
             return user_id
@@ -283,6 +274,6 @@ class DBUtil():
                 rows = cur.fetchall()
                 for rec in rows:
                     pw = rec[0]
-            return self.check_pw(params['pw'], pw)
+            return self.check_pw(params['pw'], pw), rec[1]
         except Exception as identifier:
             print identifier, "error"
