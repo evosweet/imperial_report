@@ -26,7 +26,7 @@ export class ReportService {
     }
     uploadImg(id: number, file: any): Promise <any> {
         let headers = new Headers({'Content-Type': 'image/png', 'INCIDENT-ID': id});
-        return this.http.post(this.report_url + '/save_image',JSON.stringify(file),{headers: headers})
+        return this.http.post(this.report_url + '/save_image', file, {headers: headers})
          .toPromise()
          .then(this.extractData)
          .catch(this.handleError);

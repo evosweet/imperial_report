@@ -13,6 +13,7 @@ export class ReportFormComponent {
     active = true;
     subResult = {};
     submitted = false;
+    fileStatus = false;
     events = [
             {'id': 1, 'event': 'Fire'},
             {'id': 2, 'event':  'DOMESTIC VIOLENCE'},
@@ -54,9 +55,23 @@ export class ReportFormComponent {
     }
     onUpload() {
         this.reportservice.uploadImg(this.imageModel.id, this.imageModel.file)
-        .then( result => {})
+        .then( result => {
+             if (result.result === 'ERROR') {
+                console.log("error")
+            } else {
+                this.submitted = true;
+                this.fileStatus = true;
+            }
+        });
     }
-    onChange(event: any) {
-         this.imageModel.file = event.srcElement.files;
+    closeUpload() {
+        this.imageModel = new Image(0, '');
+        this.model = new Report(this.events[0].event, this.events[0].id , '', '');
+        this.submitted = false;
+        this.fileStatus = false;
+    }
+    onChange($event: any): void {
+         var inputValue = $event.target;
+         this.imageModel.file = inputValue.files[0];
     }
 }
