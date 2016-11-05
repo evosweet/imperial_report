@@ -6,7 +6,7 @@ sys.path.append('..')
 from db.db import DBUtil
 
 CONTENT_TYPE = 'application/json'
-RESP = {'msg':''}
+RESP = {'msg':'','result': ''}
 
 class Index(object):
     def on_get(self, req, resp):
@@ -14,6 +14,7 @@ class Index(object):
             resp.status = falcon.HTTP_200
             resp.content_type = CONTENT_TYPE
             RESP['msg'] = "The God Emperor Reigns Supreme! Imperial Fist"
+            RESP['result'] = 'SUCCESS'
         except Exception as identifier:
             resp.status = falcon.HTTP_500
             resp.content_type = CONTENT_TYPE
@@ -32,9 +33,11 @@ class CreateIncident(object):
                     resp.status = falcon.HTTP_200
                     resp.content_type = CONTENT_TYPE
                     RESP['msg'] = {"reference_no":report_id}
+                    RESP['result'] = 'SUCCESS'
                 else:
                     resp.status = falcon.HTTP_500
                     RESP['msg'] = "An ERROR Occured"
+                    RESP['result'] = 'ERROR'
             else:
                 RESP['msg'] = "we jamming"
         except Exception as identifier:
@@ -52,6 +55,7 @@ class SaveIncidentImage(object):
     def on_post(self, req, resp):
         try:
             # RESP['msg'] ={}
+            print req.headers
             ext = mimetypes.guess_extension(req.content_type) 
             incident_id = req.get_header("INCIDENT-ID")
             filename = '{uuid}{ext}'.format(uuid=uuid.uuid4(), ext=ext)
@@ -64,6 +68,7 @@ class SaveIncidentImage(object):
                     image_file.write(chunk)
                 DBUtil().add_incident_image({'image_path':image_path,'incident_id':incident_id})
                 RESP['msg'] ="GOOD"
+                RESP['result'] = 'SUCCESS'
         except Exception as identifier:
             print identifier.message
         finally:
@@ -81,14 +86,45 @@ class GetIncidentInfo(object):
                     resp.content_type = CONTENT_TYPE
                     RESP['msg'] = []
                     RESP['msg'] = info
+                    RESP['result'] = 'SUCCESS'
                 else:
                     resp.status = falcon.HTTP_200
                     RESP['msg'] = 'No Incidents Found with that Number'
+                    RESP['result'] = 'ERROR'
         except Exception as identifier:
             resp.status = falcon.HTTP_500
             RESP['msg'] = identifier.message
+            RESP['result'] = 'ERROR'
         finally:
             resp.data = json.dumps(RESP)
+
+class GetIncidentByEvent(object):
+    def on_post(self, req, resp):
+        try:
+            data = ast.literal_eval(req.stream.read(req.content_length or 0))
+            if data:
+                info = DBUtil().get_incident_event(data)
+                if info:
+                    resp.status = falcon.HTTP_200
+                    resp.content_type = CONTENT_TYPE
+                    RESP['msg'] = []
+                    RESP['msg'] = info
+                    RESP['result'] = 'SUCCESS'
+                else:
+                    resp.status = falcon.HTTP_200
+                    RESP['msg'] = 'No Incidents Found with that Number'
+                    RESP['result'] = 'ERROR'
+            else:
+                resp.status = falcon.HTTP_400
+                RESP['msg'] = 'Not enough Arguments passed'
+                RESP['result'] = 'ERROR'
+        except Exception as identifier:
+            resp.status = falcon.HTTP_500
+            RESP['msg'] = identifier.message
+            RESP['result'] = 'ERROR'
+        finally:
+            resp.data = json.dumps(RESP)
+
     
 
 
