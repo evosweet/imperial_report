@@ -121,12 +121,28 @@ class DBUtil():
         except Exception as identifier:
             print identifier, "error"
 
-# db = DBUtil()
+    def get_incident_auth(self, params):
+        try:
+            con = self.connect()
+            sql = self.getConfig('sql')['get_incident_auth']
+            incidents = []
+            with con.cursor() as cur:
+                cur.execute(sql, (params['authority_id'],))
+                for rec in cur.fetchall():
+                    print rec
+                    incident = {'incident_id': rec[0], 'description': rec[1], 'location': rec[2], 'event_type': rec[3], 'dt_reported': str(rec[4]), 'dt_occured': str(rec[5]), 'contact_email': rec[6], 'status_id': rec[7], 'auth_name': rec[8]}
+                    print incident
+                    incidents.append(incident)
+                print incidents
+                return incidents
+        except Exception as identifier:
+            print identifier, "error"
+db = DBUtil()
 # # params = {'description': 'SOMETHING SOMETHING BLAH BLAH BLAH',
 # # 'location': 'KINGSTON', 'dt_reported': '2016-11-04 17:24:00', 'email':'email@mail.com', 'event_id': 1}
 # # print params
-# params = {'incident_id': '1'}
+params = {'authority_id': '16'}
 # # params = {'incident_id':'1', 'image_path':'/image.png'}
 # # params = {'id':'1', 'image_path':'/image.png'}
 # db.get_incident_image(params)
-# #  db.get_incident_event(params)
+db.get_incident_auth(params)
