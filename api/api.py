@@ -8,6 +8,7 @@ from smtp.smtp import SendMail
 
 CONTENT_TYPE = 'application/json'
 RESP = {'msg':'','result': ''}
+URL = "http://localhost:8042"
 
 class Index(object):
     def on_get(self, req, resp):
@@ -25,15 +26,19 @@ class Index(object):
 
 class CreateIncident(object):
     """creates incidents"""
-    def sendsocket(self, request):
-        """sends request to mail socket"""
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.connect(('localhost', 9088))
-        data = json.dumps(request).encode('utf-8')
-        sock.sendall(data)
-        print data
-        sock.close()
-
+    def sendCitzen(self,id,email,type):
+        try:
+             r = requests.post(URL,json={'id':id, 'email':email, 'type':type},timeout=0.01)
+        except Exception as identifier:
+            pass
+       
+    
+    def sendAuth(self,id,email,type):
+        try:
+            r = requests.post(URL,json={'id':id, '_to':email, 'type':type},timeout=0.01)
+        except Exception as identifier:
+            pass
+    
     def on_post(self, req, resp):
         """"Post request"""
         try:
@@ -45,7 +50,11 @@ class CreateIncident(object):
                     resp.content_type = CONTENT_TYPE
                     RESP['msg'] = {"reference_no":report_id}
                     RESP['result'] = 'SUCCESS'
-
+                    event = DBUtil().get_event_by_id({'id':data['event_id']})
+                    auth = DBUtil().get_event_email(data)
+                    if 'email' in data:
+                        self.sendCitzen(report_id, data['email'], event)
+                    self.sendAuth(report_id, auth, event)
                 else:
                     resp.status = falcon.HTTP_500
                     RESP['msg'] = "An ERROR Occured"
@@ -53,6 +62,7 @@ class CreateIncident(object):
             else:
                 RESP['msg'] = "we jamming"
         except Exception as identifier:
+            print identifier.message
             resp.status = falcon.HTTP_500
             RESP['msg'] = identifier.message
         finally:
