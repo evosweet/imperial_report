@@ -49,10 +49,7 @@ class SaveIncidentImage(object):
 
     def on_post(self, req, resp):
         try:
-            # data = req.stream.read(req.content_length or 0)
-            # print data
-            # if data:
-            RESP['msg'] ={}
+            # RESP['msg'] ={}
             ext = mimetypes.guess_extension(req.content_type) 
             incident_id = req.get_header("INCIDENT-ID")
             filename = '{uuid}{ext}'.format(uuid=uuid.uuid4(), ext=ext)
@@ -63,8 +60,8 @@ class SaveIncidentImage(object):
                     if not chunk:
                         break
                     image_file.write(chunk)
-                    RESP['msg']['path'] = image_path
-                    RESP['msg']['incident_id'] = incident_id
+                DBUtil().add_incident_image({'image_path':image_path,'incident_id':incident_id})
+                RESP['msg'] ="GOOD"
         except Exception as identifier:
             print identifier.message
         finally:
