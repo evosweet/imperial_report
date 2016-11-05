@@ -75,9 +75,15 @@ class GetIncidentInfo(object):
         try:
             data = ast.literal_eval(req.stream.read(req.content_length or 0))
             if data:
-                info = DBUtil.add_incident(data)
+                info = DBUtil().get_incident(data)
                 if info:
-                    pass
+                    resp.status = falcon.HTTP_200
+                    resp.content_type = CONTENT_TYPE
+                    RESP['msg'] = []
+                    RESP['msg'] = info
+                else:
+                    resp.status = falcon.HTTP_200
+                    RESP['msg'] = 'No Incidents Found with that Number'
         except Exception as identifier:
             resp.status = falcon.HTTP_500
             RESP['msg'] = identifier.message
