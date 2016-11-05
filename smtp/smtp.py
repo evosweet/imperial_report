@@ -18,8 +18,11 @@ class SendMail(object):
     def on_post(self, req, resp):
         """sends mail"""
         try:
+            print "here we go"
             data = ast.literal_eval(req.stream.read(req.content_length or 0))
+            print data
             if data:
+                print "here we are"
                 self.msg['To'], self.msg['subject'] = data['_to'], data['subject']
                 self.msg.attach(MIMEText(data['msg']))
                 mailserver = smtplib.SMTP('smtp.gmail.com', 587)
@@ -34,12 +37,12 @@ class SendMail(object):
                 mailserver.quit()
             resp.status = falcon.HTTP_200
         except Exception as identifier:
-            pass
+            print  identifier
 CORZ = CORS(allow_all_origins=True, allow_all_methods=True, allow_all_headers=True)
 API = falcon.API(middleware=[CORZ.middleware])
 
 EMAIL = SendMail()
 
-API.add_route('/', EMAIL)
+API.add_route('/email', EMAIL)
 # SEND = SendMail()
 # SEND.sendmail('this is a test', 'This is how we do it', 'desonalleyne@yahoo.com')
