@@ -47,7 +47,6 @@ class CreateIncident(object):
 
 
 class SaveIncidentImage(object):
-    
     def __init__(self, storage_path):
         self.storage_path = storage_path
 
@@ -63,7 +62,7 @@ class SaveIncidentImage(object):
                     if not chunk:
                         break
                     image_file.write(chunk)
-                DBUtil().add_incident_image({'image_path':image_path,'incident_id':incident_id})
+                DBUtil().add_incident_image({'image_path':filename,'incident_id':incident_id})
                 RESP['msg'] ="GOOD"
                 RESP['result'] = 'SUCCESS'
         except Exception as identifier:
@@ -73,25 +72,30 @@ class SaveIncidentImage(object):
 
 
 class GetIncidentImage(object):
+    def __init__(self, storage_path):
+        self.storage_path = storage_path
+
     def on_get(self, req, resp):
         try:
             params = req.get_param('path')
-            print params
-            resp.status = falcon.HTTP_200
-            RESP['msg'] = 'No Images associated with this incident'
-            RESP['result'] = 'ERROR'
-            # if data:
-            #     info = DBUtil().get_incident_image(data)
-            #     if info:
-            #         resp.status = falcon.HTTP_200
-            #         resp.content_type = CONTENT_TYPE
-            #         RESP['msg'] = []
-            #         RESP['msg'] = info
-            #         RESP['result'] = 'SUCCESS'
-            #     else:
-            #         resp.status = falcon.HTTP_200
-            #         RESP['msg'] = 'No Images associated with this incident'
-            #         RESP['result'] = 'ERROR'
+            if params:
+                try:
+                    resp.content_type = 'image/png'
+                    print type(params)
+                    image_path = os.path.join(self.storage_path, params)
+                    print image_path
+                    resp.stream = file(image_path, 'rb').read()
+                    resp.stream_len = os.path.getsize(image_path)
+                except IOError as identifier:
+                    print identifier
+                    resp.status = falcon.HTTP_200
+                    resp.content_type = CONTENT_TYPE
+                    RESP['msg'] = identifier.strerror
+                    RESP['result'] = 'ERROR'
+            else:
+                resp.status = falcon.HTTP_200
+                RESP['msg'] = 'No Images associated with this incident'
+                RESP['result'] = 'ERROR'
         except Exception as identifier:
             resp.status = falcon.HTTP_500
             RESP['msg'] = identifier.message
@@ -104,7 +108,12 @@ class GetIncidentInfo(object):
         try:
             data = ast.literal_eval(req.stream.read(req.content_length or 0))
             if data:
-                info = DBUtil().get_incident(data)
+                print data
+                if data['searchType'] == 'id':
+                    print "here"
+                    info = DBUtil().get_incident({'id':data['value']})
+                else:
+                    info = DBUtil().get_incident_email({'contact_email':data['value']})
                 if info:
                     resp.status = falcon.HTTP_200
                     resp.content_type = CONTENT_TYPE

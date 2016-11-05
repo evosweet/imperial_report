@@ -11,7 +11,7 @@ GETINCIDENTEVENT = GetIncidentByEvent()
 SAVEIMAGE = SaveIncidentImage(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'incident_images')))
 ADDINCIDENT = CreateIncident()
 GETINCIDENTAUTH = GetIncidentByAuth()
-GETIMAGE = GetIncidentImage()
+GETIMAGE = GetIncidentImage(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'incident_images')))
 
 
 API.add_route('/', INDEX)
