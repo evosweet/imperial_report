@@ -96,10 +96,10 @@ class DBUtil():
         except Exception as identifier:
             print identifier,"error"
 
-db = DBUtil()
-params = {'description': 'SOMETHING SOMETHING BLAH BLAH BLAH', 'location': 'KINGSTON', 'dt_reported': '2016-11-04 17:24:00', 'email':'email@mail.com', 'event_id': 1}
-# print params
-# params = {'event_id':'1'}
-params = {'incident_id':'1', 'image_path':'/image.png'}
-db.add_incident_image(params)
-# db.get_incident_event(params)
+# db = DBUtil()
+# params = {'description': 'SOMETHING SOMETHING BLAH BLAH BLAH', 'location': 'KINGSTON', 'dt_reported': '2016-11-04 17:24:00', 'email':'email@mail.com', 'event_id': 1}
+# # print params
+# # params = {'event_id':'1'}
+# params = {'incident_id':'1', 'image_path':'/image.png'}
+# db.add_incident_image(params)
+# # db.get_incident_event(params)
