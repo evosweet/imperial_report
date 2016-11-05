@@ -27,6 +27,7 @@ class CreateIncident(object):
             data = ast.literal_eval(req.stream.read(req.content_length or 0))
             if data:
                 report_id = DBUtil().add_incident(data)
+                print report_id
                 if report_id:
                     resp.status = falcon.HTTP_200
                     resp.content_type = CONTENT_TYPE
@@ -44,6 +45,7 @@ class CreateIncident(object):
 
 
 class SaveIncidentImage(object):
+    
     def __init__(self, storage_path):
         self.storage_path = storage_path
 
@@ -66,5 +68,21 @@ class SaveIncidentImage(object):
             print identifier.message
         finally:
             resp.data = json.dumps(RESP)
+
+
+class GetIncidentInfo(object):
+    def on_post(self, req, resp):
+        try:
+            data = ast.literal_eval(req.stream.read(req.content_length or 0))
+            if data:
+                info = DBUtil.add_incident(data)
+                if info:
+                    pass
+        except Exception as identifier:
+            resp.status = falcon.HTTP_500
+            RESP['msg'] = identifier.message
+        finally:
+            resp.data = json.dumps(RESP)
+    
 
 
