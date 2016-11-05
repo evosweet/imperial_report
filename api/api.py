@@ -28,7 +28,6 @@ class CreateIncident(object):
             data = ast.literal_eval(req.stream.read(req.content_length or 0))
             if data:
                 report_id = DBUtil().add_incident(data)
-                print report_id
                 if report_id:
                     resp.status = falcon.HTTP_200
                     resp.content_type = CONTENT_TYPE
@@ -54,8 +53,6 @@ class SaveIncidentImage(object):
 
     def on_post(self, req, resp):
         try:
-            # RESP['msg'] ={}
-            print req.headers
             ext = mimetypes.guess_extension(req.content_type) 
             incident_id = req.get_header("INCIDENT-ID")
             filename = '{uuid}{ext}'.format(uuid=uuid.uuid4(), ext=ext)
@@ -104,6 +101,7 @@ class GetIncidentByEvent(object):
             data = ast.literal_eval(req.stream.read(req.content_length or 0))
             if data:
                 info = DBUtil().get_incident_event(data)
+                print info
                 if info:
                     resp.status = falcon.HTTP_200
                     resp.content_type = CONTENT_TYPE
@@ -125,6 +123,31 @@ class GetIncidentByEvent(object):
         finally:
             resp.data = json.dumps(RESP)
 
-    
+class GetIncidentByAuth(object):
+    def on_post(self, req, resp):
+        try:
+            data = ast.literal_eval(req.stream.read(req.content_length or 0))
+            if data:
+                info = DBUtil().get_incident_auth(data)
+                if info:
+                    resp.status = falcon.HTTP_200
+                    resp.content_type = CONTENT_TYPE
+                    RESP['msg'] = []
+                    RESP['msg'] = info
+                    RESP['result'] = 'SUCCESS'
+                else:
+                    resp.status = falcon.HTTP_200
+                    RESP['msg'] = 'No Incidents found'
+                    RESP['result'] = 'ERROR'
+            else:
+                resp.status = falcon.HTTP_400
+                RESP['msg'] = 'Not enough Arguments passed'
+                RESP['result'] = 'ERROR'
+        except Exception as identifier:
+            resp.status = falcon.HTTP_500
+            RESP['msg'] = identifier.message
+            RESP['result'] = 'ERROR'
+        finally:
+            resp.data = json.dumps(RESP)
 
 
