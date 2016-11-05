@@ -164,3 +164,18 @@ class DBUtil():
                 return incidents
         except Exception as identifier:
             print identifier, "error"
+
+    def get_event_email(self, params):
+        try:
+            con = self.connect()
+            sql = self.getConfig('sql')['get_event_email']
+            emails = []
+            with con.cursor() as cur:
+                cur.execute(sql, (params['event_id'],))
+                rows = cur.fetchall()
+                for rec in rows:
+                    email = {'email': rec[0]}
+                    emails.append(email)
+            return incidents
+        except Exception as identifier:
+            print identifier, "error"
