@@ -72,6 +72,33 @@ class SaveIncidentImage(object):
             resp.data = json.dumps(RESP)
 
 
+class GetIncidentImage(object):
+    def on_get(self, req, resp):
+        try:
+            params = req.get_param('path')
+            print params
+            resp.status = falcon.HTTP_200
+            RESP['msg'] = 'No Images associated with this incident'
+            RESP['result'] = 'ERROR'
+            # if data:
+            #     info = DBUtil().get_incident_image(data)
+            #     if info:
+            #         resp.status = falcon.HTTP_200
+            #         resp.content_type = CONTENT_TYPE
+            #         RESP['msg'] = []
+            #         RESP['msg'] = info
+            #         RESP['result'] = 'SUCCESS'
+            #     else:
+            #         resp.status = falcon.HTTP_200
+            #         RESP['msg'] = 'No Images associated with this incident'
+            #         RESP['result'] = 'ERROR'
+        except Exception as identifier:
+            resp.status = falcon.HTTP_500
+            RESP['msg'] = identifier.message
+            RESP['result'] = 'ERROR'
+        finally:
+            resp.data = json.dumps(RESP)
+
 class GetIncidentInfo(object):
     def on_post(self, req, resp):
         try:
@@ -82,6 +109,7 @@ class GetIncidentInfo(object):
                     resp.status = falcon.HTTP_200
                     resp.content_type = CONTENT_TYPE
                     RESP['msg'] = []
+                    print type(RESP['msg'])
                     RESP['msg'] = info
                     RESP['result'] = 'SUCCESS'
                 else:
@@ -93,6 +121,7 @@ class GetIncidentInfo(object):
             RESP['msg'] = identifier.message
             RESP['result'] = 'ERROR'
         finally:
+            print type(RESP['msg'])
             resp.data = json.dumps(RESP)
 
 class GetIncidentByEvent(object):
