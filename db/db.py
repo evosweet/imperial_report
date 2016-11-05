@@ -2,6 +2,7 @@ import pymysql
 import ConfigParser
 import ast
 import datetime
+from werkzeug.security import generate_password_hash, check_password_hash
 
 
 class DBUtil():
@@ -161,7 +162,7 @@ class DBUtil():
                 for rec in cur.fetchall():
                     auth = {'auth': rec[0], 'auth_id': rec[1]}
                     auths.append(auth)
-                return incidents
+                return auths
         except Exception as identifier:
             print identifier, "error"
 
@@ -174,9 +175,8 @@ class DBUtil():
                 cur.execute(sql, (params['event_id'],))
                 rows = cur.fetchall()
                 for rec in rows:
-                    email = {'email': rec[0]}
-                    emails.append(email)
-            return incidents
+                    emails.append(rec[0])
+            return emails
         except Exception as identifier:
             print identifier, "error"
 
@@ -188,7 +188,101 @@ class DBUtil():
                 cur.execute(sql, (params['id'],))
                 rows = cur.fetchall()
                 for rec in rows:
-                    event = rec[0]
+                    event = rec[1]
             return event
+        except Exception as identifier:
+            print identifier, "error"
+
+    def add_feedback(self, params):
+        try:
+            con = self.connect()
+            sql = self.getConfig('sql')['add_feedback']
+            gt = datetime.datetime.now()
+
+            if 'dt_occured' not in params:
+                params['dt_occured'] = dt_reported
+            if 'contact_no' not in params:
+                params['contact_no'] = None
+            if 'path' not in params:
+                params['path'] = None
+            if 'email' not in params:
+                params['email'] = None
+            with con.cursor() as cur:
+                cur.execute(sql, (params['incident_id'], params['comment'], dt, params['user_id']))
+                feedback = con.insert_id()
+                con.commit()
+            return incident_id
+        except Exception as identifier:
+            print identifier, "error"
+
+    def get_feedback(self, params):
+        try:
+            feedbacks = []
+            images = self.get_incident_image(params)
+            con = self.connect()
+            sql = self.getConfig('sql')['get_incident']
+            incidents = []
+            with con.cursor() as cur:
+                cur.execute(sql, (params['id'],))
+                for rec in cur.fetchall():
+                    # incident = {'id': rec[1], 'name': rec[2], 'desc': rec[3], 'email': rec[4], 'person_of_contact': rec[5], 'phone': rec[6], 'address': rec[7], 'website': rec[8]}
+                    incident = {'id': rec[0], 'description': rec[1], 'location': rec[2], 'event_type': rec[3], 'dt_reported': str(rec[4]), 'dt_occured': str(rec[5]), 'contact_email': rec[6], 'status': rec[7], 'auth': rec[8], 'auths': [], 'images': []}
+                    images = self.get_incident_image(incident)
+                    auths = self.get_incident_auth(incident)
+                    incident['images'] = images
+                    incident['auths'] = auths
+                    incidents.append(incident)
+            return incidents
+        except Exception as identifier:
+            print identifier, "error"
+
+
+
+
+
+    def hash_pw(self, password):
+        return generate_password_hash(password)
+
+    def check_pw(self, password, hashed):
+        return check_password_hash(hashed, password)
+
+
+
+    def add_user(self, params):
+        try:
+            params['pw'] = self.hash_pw(params['pw'])
+            print params['pw']
+            con = self.connect()
+            sql = self.getConfig('sql')['add_user']
+            params['dt_created'] = datetime.datetime.now()
+            print "endling"
+
+            # if 'dt_occured' not in params:
+            #     params['dt_occured'] = dt_reported
+            # if 'contact_no' not in params:
+            #     params['contact_no'] = None
+            # if 'path' not in params:
+            #     params['path'] = None
+            # if 'email' not in params:
+            #     params['email'] = None
+
+            with con.cursor() as cur:
+                cur.execute(sql, (params['username'], params['pw'], params['level'], params['created_by'], params['dt_created'],))
+                user_id = con.insert_id()
+                con.commit()
+            return user_id
+        except Exception as identifier:
+            print identifier, "error"
+
+    def login(self, params):
+        try:
+            con = self.connect()
+            sql = self.getConfig('sql')['login']
+            with con.cursor() as cur:
+                cur.execute(sql, (params['username'],))
+                rows = cur.fetchall()
+                for rec in rows:
+                    pw = rec[0]
+            return self.check_pw(params['pw'], pw)
         except Exception as identifier:
             print identifier, "error"
