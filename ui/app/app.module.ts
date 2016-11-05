@@ -10,12 +10,13 @@ import { MyIncidentFormComponent } from './forms/my-Incident-form.component';
 
 import { AppRoutingModule, routingComponents } from './app.routing';
 import { ReportService } from './_service/report.service';
+import { AuthGuard } from './_guard/auth.guard';
 
 @NgModule({
   imports:      [ BrowserModule, AppRoutingModule, FormsModule, HttpModule],
   declarations: [ AppComponent, routingComponents , HomeComponent,
                   ReportFormComponent, MyIncidentFormComponent ],
-  providers: [ ReportService ],
+  providers: [ ReportService, AuthGuard ],
   bootstrap:    [ AppComponent ]
 })
 export class AppModule { }
