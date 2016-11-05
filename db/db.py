@@ -57,7 +57,7 @@ class DBUtil():
                 cur.execute(sql, (params['id'],))
                 for rec in cur.fetchall():
                     # incident = {'id': rec[1], 'name': rec[2], 'desc': rec[3], 'email': rec[4], 'person_of_contact': rec[5], 'phone': rec[6], 'address': rec[7], 'website': rec[8]}
-                    incident = {'id': rec[0], 'description': rec[1], 'location': rec[2], 'event_type': rec[3], 'dt_reported': str(rec[4]), 'dt_occured': str(rec[5]), 'contact_email': rec[6], 'status': rec[7], 'auth': rec[8], 'auth_id': rec[9],'images':images}
+                    incident = {'id': rec[0], 'description': rec[1], 'location': rec[2], 'event_type': rec[3], 'dt_reported': str(rec[4]), 'dt_occured': str(rec[5]), 'contact_email': rec[6], 'status_id': rec[7], 'auth': rec[8], 'auth_id': rec[9],'images':images}
                     # incident = {'id': rec[0], 'description': rec[1], 'location': rec[2], 'dt_reported': str(rec[3]), 'event_id': rec[4], 'dt_occured': str(rec[5]), 'contact_email': rec[6], 'contact_no': rec[7], 'has_image': rec[8], 'status_id': rec[9], 'images':images}
                     incidents.append(incident)
             return incidents
@@ -74,6 +74,21 @@ class DBUtil():
                 rows = cur.fetchall()
                 for rec in rows:
                     incident = {'id': rec[0], 'description': rec[1], 'location': rec[2], 'event_type': rec[3], 'dt_reported': str(rec[4]), 'dt_occured': str(rec[5]), 'contact_email': rec[6], 'status': rec[7], 'auth': rec[8], 'auth_id': rec[9],'images':images}
+                    incidents.append(incident)
+            return incidents
+        except Exception as identifier:
+            print identifier, "error"
+
+    def get_incident_email(self, params):
+        try:
+            con = self.connect()
+            sql = self.getConfig('sql')['get_incident_mail']
+            incidents = []
+            with con.cursor() as cur:
+                cur.execute(sql, (params['contact_email'],))
+                rows = cur.fetchall()
+                for rec in rows:
+                        incident = {'id': rec[0], 'description': rec[1], 'location': rec[2], 'event_type': rec[3], 'dt_reported': str(rec[4]), 'dt_occured': str(rec[5]), 'contact_email': rec[6], 'status': rec[7], 'auth': rec[8], 'auth_id': rec[9],'images':images}
                     incidents.append(incident)
             return incidents
         except Exception as identifier:
