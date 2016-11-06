@@ -182,7 +182,7 @@ class DBUtil():
             return out
         except Exception as identifier:
             print identifier, "error"
-            return out
+            return 0
 
     def get_event_email(self, params):
         try:
@@ -306,6 +306,6 @@ class DBUtil():
                 rows = cur.fetchall()
                 for rec in rows:
                     pw = rec[0]
-            return self.check_pw(params['pw'], pw), rec[1]
+            return self.check_pw(params['pw'], pw), rec[1], rec[2]
         except Exception as identifier:
             print identifier, "error"
