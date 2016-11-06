@@ -230,16 +230,39 @@ class DBUtil():
         except Exception as identifier:
             print identifier, "error"
 
-
     def hash_pw(self, password):
         return generate_password_hash(password)
 
     def check_pw(self, password, hashed):
         return check_password_hash(hashed, password)
 
-
-
     def add_user(self, params):
+        try:
+            params['pw'] = self.hash_pw(params['pw'])
+            print params['pw']
+            con = self.connect()
+            sql = self.getConfig('sql')['add_user']
+            params['dt_created'] = datetime.datetime.now()
+            print "endling"
+
+            # if 'dt_occured' not in params:
+            #     params['dt_occured'] = dt_reported
+            # if 'contact_no' not in params:
+            #     params['contact_no'] = None
+            # if 'path' not in params:
+            #     params['path'] = None
+            # if 'email' not in params:
+            #     params['email'] = None
+
+            with con.cursor() as cur:
+                cur.execute(sql, (params['username'], params['pw'], params['level'], params['created_by'], params['dt_created'], params['auth_id'],))
+                user_id = con.insert_id()
+                con.commit()
+            return user_id
+        except Exception as identifier:
+            print identifier, "error"
+
+    def edit_user(self, params):
         try:
             params['pw'] = self.hash_pw(params['pw'])
             print params['pw']
