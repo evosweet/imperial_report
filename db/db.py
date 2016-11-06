@@ -49,8 +49,6 @@ class DBUtil():
 
     def get_incident(self, params):
         try:
-            images = []
-            images = self.get_incident_image(params)
             con = self.connect()
             sql = self.getConfig('sql')['get_incident']
             incidents = []
@@ -61,8 +59,10 @@ class DBUtil():
                     incident = {'id': rec[0], 'description': rec[1], 'location': rec[2], 'event_type': rec[3], 'dt_reported': str(rec[4]), 'dt_occured': str(rec[5]), 'contact_email': rec[6], 'status': rec[7], 'auth': rec[8], 'auths': [], 'images': []}
                     images = self.get_incident_image(incident)
                     auths = self.get_incident_auth(incident)
+                    feedbacks = self.get_feedbacks(incident)
                     incident['images'] = images
                     incident['auths'] = auths
+                    incident['feedbacks'] = feedbacks
                     incidents.append(incident)
             return incidents
         except Exception as identifier:
@@ -74,14 +74,16 @@ class DBUtil():
             sql = self.getConfig('sql')['get_incident_by_event']
             incidents = []
             with con.cursor() as cur:
-                cur.execute(sql, (params['event_id'],))
+                cur.execute(sql, (params['event_id'],params['status_id'],))
                 rows = cur.fetchall()
                 for rec in rows:
-                    incident = {'id': rec[0], 'description': rec[1], 'location': rec[2], 'event_type': rec[3], 'dt_reported': str(rec[4]), 'dt_occured': str(rec[5]), 'contact_email': rec[6], 'status': rec[7], 'auths': [], 'images': []}
+                    incident = {'id': rec[0], 'description': rec[1], 'location': rec[2], 'event_type': rec[3], 'dt_reported': str(rec[4]), 'dt_occured': str(rec[5]), 'contact_email': rec[6], 'status': rec[7], 'auths': [], 'images': [], 'feedbacks': []}
                     images = self.get_incident_image(incident)
                     auths = self.get_incident_auth(incident)
+                    feedbacks = self.get_feedbacks(incident)
                     incident['images'] = images
                     incident['auths'] = auths
+                    incident['feedbacks'] = feedbacks
                     incidents.append(incident)
             return incidents
         except Exception as identifier:
@@ -96,11 +98,13 @@ class DBUtil():
                 cur.execute(sql, (params['contact_email'],))
                 rows = cur.fetchall()
                 for rec in rows:
-                    incident = {'id': rec[0], 'description': rec[1], 'location': rec[2], 'event_type': rec[3], 'dt_reported': str(rec[4]), 'dt_occured': str(rec[5]), 'contact_email': rec[6], 'status': rec[7], 'auths': [], 'images': []}
+                    incident = {'id': rec[0], 'description': rec[1], 'location': rec[2], 'event_type': rec[3], 'dt_reported': str(rec[4]), 'dt_occured': str(rec[5]), 'contact_email': rec[6], 'status': rec[7], 'auths': [], 'images': [], 'feedbacks':[]}
                     images = self.get_incident_image(incident)
                     auths = self.get_incident_auth(incident)
+                    feedbacks = self.get_feedbacks(incident)
                     incident['images'] = images
                     incident['auths'] = auths
+                    incident['feedbacks'] = feedbacks
                     incidents.append(incident)
             return incidents
         except Exception as identifier:
@@ -115,11 +119,13 @@ class DBUtil():
                 cur.execute(sql, (params['status_id'],))
                 rows = cur.fetchall()
                 for rec in rows:
-                    incident = {'id': rec[0], 'description': rec[1], 'location': rec[2], 'event_type': rec[3], 'dt_reported': str(rec[4]), 'dt_occured': str(rec[5]), 'contact_email': rec[6], 'status': rec[7], 'auths': [], 'images': []}
+                    incident = {'id': rec[0], 'description': rec[1], 'location': rec[2], 'event_type': rec[3], 'dt_reported': str(rec[4]), 'dt_occured': str(rec[5]), 'contact_email': rec[6], 'status': rec[7], 'auths': [], 'images': [], 'feedbacks': []}
                     images = self.get_incident_image(incident)
                     auths = self.get_incident_auth(incident)
+                    feedbacks = self.get_feedbacks(incident)
                     incident['images'] = images
                     incident['auths'] = auths
+                    incident['feedbacks'] = feedbacks
                     incidents.append(incident)
             return incidents
         except Exception as identifier:
@@ -166,6 +172,18 @@ class DBUtil():
         except Exception as identifier:
             print identifier, "error"
 
+    def update_incident(self, params):
+        try:
+            con = self.connect()
+            sql = self.getConfig('sql')['update_incident']
+            with con.cursor() as cur:
+                out = cur.execute(sql, (params['status_id'], params['id'],))
+                con.commit()
+            return out
+        except Exception as identifier:
+            print identifier, "error"
+            return out
+
     def get_event_email(self, params):
         try:
             con = self.connect()
@@ -197,16 +215,7 @@ class DBUtil():
         try:
             con = self.connect()
             sql = self.getConfig('sql')['add_feedback']
-            gt = datetime.datetime.now()
-
-            if 'dt_occured' not in params:
-                params['dt_occured'] = dt_reported
-            if 'contact_no' not in params:
-                params['contact_no'] = None
-            if 'path' not in params:
-                params['path'] = None
-            if 'email' not in params:
-                params['email'] = None
+            dt = datetime.datetime.now()
             with con.cursor() as cur:
                 cur.execute(sql, (params['incident_id'], params['comment'], dt, params['user_id'],))
                 feedback_id = con.insert_id()
@@ -222,7 +231,7 @@ class DBUtil():
             sql = self.getConfig('sql')['get_feedback']
             feedbacks = []
             with con.cursor() as cur:
-                cur.execute(sql, (params['incident_id'],))
+                cur.execute(sql, (params['id'],))
                 for rec in cur.fetchall():
                     feedback = {'id': rec[0], 'incident_id': rec[1], 'comment': rec[2], 'dt': str(rec[3]), 'user': rec[4]}
                     feedbacks.append(feedback)
