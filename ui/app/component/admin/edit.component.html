@@ -1,3 +1,91 @@
 <div class="container">
-    test ui stuff 
+    <form (ngSubmit)="onSubmit()" #searchForm="ngForm" *ngIf="active">
+        <div class="input-group">
+            <div class="input-group-btn">
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{searchSelect}} <span class="caret"></span></button>
+                <ul class="dropdown-menu">
+                    <li><a (click)="setType('incident_id')"> Search By Report ID </a></li>
+                    <li><a (click)="setType('contact_email')"> Search By User Name</a></li>
+                    <li><a (click)="setType('event_type')"> Search By Event Type</a></li>
+                </ul>
+            </div>
+            <input type="text" class="form-control" id="searchParm" required [(ngModel)]="model.searchParm" name="searchParm" #searchParm="ngModel">
+        </div>
+        <br/>
+        <div class="form-group">
+            <label for="eventType">Status</label>
+            <select class="form-control" id="stat" required [(ngModel)]="model.statusId" name="stat" #stat="ngModel">
+                <option *ngFor="let s of status" [value]="s.id"> {{s.value}} </option>
+            </select>
+         </div> 
+        <br/>
+        <div class="form-group">
+            <button type="submit" class="btn btn-default" [disabled]="!searchForm.form.valid || !model.searchType" class="form-control"> Search </button>
+        </div>
+    </form>
+</div>
+<div *ngIf="detailView" class="container">
+  <div class="panel panel-success">
+      <button class="btn btn-default" (click)="editMe(singleReport)"> Update Incident </button>
+    <div class="panel-heading">Details For Report Number {{singleReport.id}}</div>
+    <div class="container" *ngIf="edit"><br/>
+     <div class="well well-sm">  
+     <form #editForm="ngForm">
+            <label for="eventType">Status</label>
+            <select class="form-control" id="stat" required [(ngModel)]="model.statusId" name="stat" #stat="ngModel">
+                <option *ngFor="let s of status" [value]="s.id"> {{s.value}} </option>
+            </select>
+            <br/>
+            <button type="button" class="btn btn-default"  class="form-control" (click)="updateStatus()"> Change Status </button>
+            <label for="feedback">Feed Back</label>
+            <textarea type="text" class="form-control" name="model.feedback" [(ngModel)]="model.feedback" #feedBack="ngModel" required row="3"></textarea>
+            <br/>
+            <button type="button" class="btn btn-default"  class="form-control" (click)="addFeedback()"> Add FeedBack </button>
+     </form>
+    </div>
+</div>
+    <div class="panel-body">
+        <h4> Status: {{ singleReport.status }}</h4>
+        <h5>Location: {{ singleReport.location }}</h5>
+        <h5>Contact Email: {{ singleReport.contact_email}}</h5>
+        <h5>Event Type: {{singleReport.event_type}}</h5>
+        <h5>Date of Incident: {{singleReport.dt_occured}}</h5>
+        <h4>Description:</h4>
+        <p>
+            {{singleReport.description}}
+        </p>
+            <div class="row" *ngIf="singleReport.images.length > 0">
+                <div class="col-xs-6 col-md-3">
+                    <a *ngFor="let image of singleReport.images"  class="thumbnail">
+                        <img src="http://lloyd-asus:8041/get_image?name={{image.image_path}}" alt="Smile">
+                    </a>
+                </div>
+            </div>
+            <div class="row" *ngIf="singleReport.feedbacks.length > 0">
+
+            </div>
+            <div class="row" *ngIf="singleReport.auths.length > 0">
+                <ul class="list-group">
+                     <h6><li class="list-group-item" *ngFor="let auth of singleReport.auths">{{ auth.auth }}</li></h6>
+                </ul>
+            </div>
+    </div>
+    <div class="panel-footer"><h5>Date Reported: {{singleReport.dt_reported}}</h5></div>
+</div>
+</div>
+<div class="container">
+    <div  *ngIf="searchView" class="list-group">
+        <a *ngFor="let report of returnData" class="list-group-item" (click)="viewDetails(report)">
+            <h4>ID : {{ report.id }}</h4> 
+            <h5 *ngIf="report.contact_email"> Contact Email {{ report.contact_email }}</h5> 
+            <p>
+                Date: {{ report.dt_occured}} <br/>
+                Location: {{ report.location }} <br/>
+                Event Type: {{report.event_type}}
+            </p>
+       </a>
+    </div>
+</div>
+<div class="container" *ngIf="errorView">
+    <div class="alert alert-danger" role="alert"> Sorry No Results Found </div>
 </div>

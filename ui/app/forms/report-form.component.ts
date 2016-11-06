@@ -32,17 +32,27 @@ export class ReportFormComponent {
             {'id': 15, 'event': 'VANDALISM'},
             {'id': 10, 'event': 'OTHER'},
         ]
-    model = new Report(this.events[0].event, this.events[0].id , '', '');
+
+    districts = [
+        {'id': 1, 'district': "OUTSIDE GEORGETOWN"},
+        {'id': 3, 'district': "PETER' S HALL"},
+        {'id': 4, 'district': "QUEENSTOWN"},
+        {'id': 5, 'district': "ALBERTTOWN"},
+        {'id': 6, 'district': "SOUTH CUMMINGSBURG"},
+        {'id': 7, 'district': "NORTH CUMMINGSBURG"}
+    ]
+    model = new Report(this.events[0].event, this.events[0].id, this.districts[0].id, this.districts[0].district , '', '');
     imageModel = new Image(0, '');
     constructor(private reportservice: ReportService, ) {}
     newReport() {
-        this.model = new Report(this.events[0].event, this.events[0].id , '', '');
+        this.model = new Report(this.events[0].event, this.events[0].id, this.districts[0].id, this.districts[0].district , '', '');
         this.active = false;
         setTimeout(() => this.active = true, 0);
          this.submitted = false;
     }
     onSubmit() {
-        this.reportservice.makeReport(this.model.event_id, this.model.location, this.model.description,
+        //event: number, location: string, description: string, district_id: number, phone?: string,email?: string, reportDate?: string
+        this.reportservice.makeReport(this.model.event_id, this.model.location, this.model.description,this.model.district_id,
         this.model.phone, this.model.email, this.model.reportDate)
         .then( result => {
             if (result.result === 'ERROR') {
@@ -68,7 +78,7 @@ export class ReportFormComponent {
     }
     closeUpload() {
         this.imageModel = new Image(0, '');
-        this.model = new Report(this.events[0].event, this.events[0].id , '', '');
+        this.model = new Report(this.events[0].event, this.events[0].id, this.districts[0].id, this.districts[0].district , '', '');
         this.submitted = false;
         this.fileStatus = false;
     }

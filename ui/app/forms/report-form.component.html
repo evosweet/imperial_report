@@ -6,6 +6,12 @@
                 <option *ngFor="let e of events" [value]="e.id"> {{e.event}} </option>
             </select>
          </div> 
+         <div class="form-group">
+            <label for="eventType">District</label>
+            <select class="form-control"  required [(ngModel)]="model.district_id" name="district_id" #districtType="ngModel">
+                <option *ngFor="let d of districts" [value]="d.id"> {{d.district}} </option>
+            </select>
+         </div> 
           <div class="form-group">
              <label for="location">Location  minimum  10 characters</label>
              <input type="text" class="form-control" id="location" required [(ngModel)]="model.location" name="location" #location="ngModel" pattern=".{10,}">

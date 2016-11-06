@@ -21,6 +21,7 @@
     <div class="panel-heading">Details For Report Number {{singleReport.id}}</div>
     <div class="panel-body">
         <h4> Status: {{ singleReport.status }}</h4>
+        <h5>District: {{ singleReport.district}}</h5>
         <h5>Location: {{ singleReport.location }}</h5>
         <h5>Contact Email: {{ singleReport.contact_email}}</h5>
         <h5>Event Type: {{singleReport.event_type}}</h5>
@@ -48,7 +49,8 @@
             <p>
                 Date: {{ report.dt_occured}} <br/>
                 Location: {{ report.location }} <br/>
-                Event Type: {{report.event_type}}
+                Event Type: {{report.event_type}}<br/>
+                District: {{report.district}}
             </p>
        </a>
     </div>
