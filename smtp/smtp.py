@@ -20,6 +20,28 @@ class SendMail(object):
         self.msg = MIMEMultipart('alternative')
         self.msg['From'] = self.LOGIN
         self.msg['subject']  = "An incident has been reported"
+        self.user="""
+        <html>
+            <head>
+                <link type="text/css" rel="stylesheet" href="https://html-online.com/editor/tinymce/skins/lightgray/content.min.css">
+            </head>
+            <body>
+                <h1 style="color: #5e9ca0;"><span style="color: #333399;"><strong>Citizen Incident Reporting System</strong></span><img style="float: right;" src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Coat_of_arms_of_Guyana.svg/250px-Coat_of_arms_of_Guyana.svg.png" alt="" width="96" height="92" /></h1>
+            <h2 style="padding-left: 30px; text-align: center;"><span style="color: #3366ff;"><strong>One People One Nation One Destiny</strong></span></h2>
+            <hr />
+            <h2 style="text-align: center;">&nbsp;<span style="color: #3366ff;">Report submitted!</span></h2>
+            <p>&nbsp;</p>
+            <p>Dear Government Officert <,</p>
+            <p>You have been added to the Government of Guyana's Citizen Reporting System. Your username is <strong>%s</strong> and your password is <strong>%s</strong>.</p>
+            <p><strong>Thanks.</strong></p>
+            <p><strong>The CIRS team.&nbsp;</strong></p>
+            <h2>&nbsp;</h2>
+            <p style="text-align: center;"><strong>A GoG Initiative! &nbsp;</strong></p>
+            <p style="text-align: center;"><strong>Brought to you by Imperial Fist &reg; and&nbsp;<a href="https://html-online.com/editor/">Html-Online</a></strong></p>
+            <p><strong>&nbsp;</strong></p>
+            </body>
+            </html>
+        """
         self.citizen ="""
             <html>
             <head>
@@ -27,7 +49,7 @@ class SendMail(object):
             </head>
             <body>
                 <h1 style="color: #5e9ca0;"><span style="color: #333399;"><strong>Citizen Incident Reporting System</strong></span><img style="float: right;" src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Coat_of_arms_of_Guyana.svg/250px-Coat_of_arms_of_Guyana.svg.png" alt="" width="96" height="92" /></h1>
-            <h2 style="padding-left: 30px; text-align: center;"><span style="color: #3366ff;"><strong>Lorem Ispum Ispum Lorem</strong></span></h2>
+            <h2 style="padding-left: 30px; text-align: center;"><span style="color: #3366ff;"><strong>One People One Nation One Destiny</strong></span></h2>
             <hr />
             <h2 style="text-align: center;">&nbsp;<span style="color: #3366ff;">Report submitted!</span></h2>
             <p>&nbsp;</p>
@@ -54,7 +76,7 @@ class SendMail(object):
             </head>
             <body>
                 <h1 style="color: #5e9ca0;"><span style="color: #333399;"><strong>Citizen Incident Reporting System</strong></span><img style="float: right;" src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Coat_of_arms_of_Guyana.svg/250px-Coat_of_arms_of_Guyana.svg.png" alt="" width="96" height="92" /></h1>
-            <h2 style="padding-left: 30px; text-align: center;"><span style="color: #3366ff;"><strong>Lorem Ispum Ispum Lorem</strong></span></h2>
+            <h2 style="padding-left: 30px; text-align: center;"><span style="color: #3366ff;"><strong>One People One Nation One Destiny</strong></span></h2>
             <hr />
             <h2 style="text-align: center;">&nbsp;<span style="color: #3366ff;">Report submitted!</span></h2>
             <p>&nbsp;</p>
@@ -82,6 +104,10 @@ class SendMail(object):
                     recipients = data['email']
                     self.msg['To'] = data['email']
                     body = self.citizen % (data['email'], data['type'], data['id'])
+                elif 'user' in data:
+                    recipients = data['user']
+                    self.msg['To'] = data['user']
+                    body = self.user % (data['user'], data['pw'])
                 else:
                     recipients = data['_to']
                     self.msg['To'] = ", ".join(data['_to'])

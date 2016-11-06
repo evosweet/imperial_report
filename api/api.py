@@ -1,7 +1,8 @@
-import falcon,json,ast,requests,socket
+import falcon,json,ast,requests,socket,datetime,random,string
 import os, sys
 import uuid
 import mimetypes
+from authenticate import Auth
 sys.path.append('..')
 from db.db import DBUtil
 from smtp.smtp import SendMail
@@ -9,6 +10,7 @@ from smtp.smtp import SendMail
 CONTENT_TYPE = 'application/json'
 RESP = {'msg':'','result': ''}
 URL = "http://localhost:8042"
+
 
 class Index(object):
     def on_get(self, req, resp):
@@ -88,6 +90,7 @@ class SaveIncidentImage(object):
                     if not chunk:
                         break
                     image_file.write(chunk)
+                print image_path
                 DBUtil().add_incident_image({'image_path':filename, 'incident_id': incident_id})
                 RESP['msg'] = "GOOD"
                 RESP['result'] = 'SUCCESS'
@@ -209,6 +212,63 @@ class GetIncidentByAuth(object):
             resp.status = falcon.HTTP_500
             RESP['msg'] = identifier.message
             RESP['result'] = 'ERROR'
+        finally:
+            resp.data = json.dumps(RESP)
+
+class CreateUser(object):
+    def on_post(self, req, resp):
+        """post method"""
+        try:
+            isvalid = Auth().authenticate(req.get_header("authToken"), 2)
+            print isvalid
+            if isvalid['Allow'] == 1:
+                print "here"
+                data = ast.literal_eval(req.stream.read(req.content_length or 0))
+                print data
+                if data:
+                    pw = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(10))
+                    print pw
+                    params = {'username':data['username'], 'pw':pw,'level':'user', 'created_by':isvalid['user'], 'dt_created':str(datetime.datetime.now()), 'auth_id':data['auth_id']}
+                    print params
+                    if DBUtil().add_user(params):
+                        resp.content_type = CONTENT_TYPE
+                        resp.status = falcon.HTTP_200
+                        RESP['msg'] = "GOOD"
+                        RESP['result'] = 'SUCCESS'
+                        try:
+                            r = requests.post(URL,json={'pw':pw, 'user':email},timeout=0.01)
+                        except Exception as identifier:
+                            pass
+                    else:
+                        resp.content_type = CONTENT_TYPE
+                        resp.status = falcon.HTTP_400
+                        RESP['msg'] = "UNABLE TO ADD"
+                        RESP['result'] = 'ERROR'
+            else:
+                resp.content_type = CONTENT_TYPE
+                resp.status = isvalid['res']
+                RESP['msg'] = isvalid['msg']
+                RESP['result'] = 'ERROR'
+        except Exception as identifier:
+            print identifier
+            resp.content_type = CONTENT_TYPE
+            resp.status = falcon.HTTP_500
+            RESP['msg'] = "UNABLE TO ADD"
+            RESP['result'] = 'ERROR'
+        finally:
+            resp.data = json.dumps(RESP)
+
+class Login(object):
+    def on_post(self, req, resp):
+        """post method"""
+        try:
+            data = ast.literal_eval(req.stream.read(req.content_length or 0))
+            if data:
+                token = Auth().gettoken(data)
+                resp.status = falcon.HTTP_200
+                RESP = token
+        except Exception as identifier:
+            print identifier
         finally:
             resp.data = json.dumps(RESP)
 
