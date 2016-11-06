@@ -40,7 +40,7 @@ class DBUtil():
 
             with con.cursor() as cur:
                 cur.execute(sql, (params['description'], params['location'],
-                    params['event_id'], dt_reported, params['dt_occured'], params['email'], params['contact_no'],))
+                    params['event_id'], dt_reported, params['dt_occured'], params['email'], params['contact_no'],params['district_id'],))
                 incident_id = con.insert_id()
                 con.commit()
             return incident_id
@@ -55,8 +55,9 @@ class DBUtil():
             with con.cursor() as cur:
                 cur.execute(sql, (params['id'],))
                 for rec in cur.fetchall():
+                    print rec
                     # incident = {'id': rec[1], 'name': rec[2], 'desc': rec[3], 'email': rec[4], 'person_of_contact': rec[5], 'phone': rec[6], 'address': rec[7], 'website': rec[8]}
-                    incident = {'id': rec[0], 'description': rec[1], 'location': rec[2], 'event_type': rec[3], 'dt_reported': str(rec[4]), 'dt_occured': str(rec[5]), 'contact_email': rec[6], 'status': rec[7], 'auth': rec[8], 'auths': [], 'images': []}
+                    incident = {'id': rec[0], 'description': rec[1], 'location': rec[2], 'event_type': rec[3], 'dt_reported': str(rec[4]), 'dt_occured': str(rec[5]), 'contact_email': rec[6], 'status': rec[7], 'auth': rec[8], 'auths': [], 'images': [], 'district':rec[10]}
                     images = self.get_incident_image(incident)
                     auths = self.get_incident_auth(incident)
                     feedbacks = self.get_feedbacks(incident)
@@ -78,7 +79,7 @@ class DBUtil():
                 cur.execute(sql)
                 for rec in cur.fetchall():
                     # incident = {'id': rec[1], 'name': rec[2], 'desc': rec[3], 'email': rec[4], 'person_of_contact': rec[5], 'phone': rec[6], 'address': rec[7], 'website': rec[8]}
-                    incident = {'id': rec[0], 'description': rec[1], 'location': rec[2], 'event_type': rec[3], 'dt_reported': str(rec[4]), 'dt_occured': str(rec[5]), 'contact_email': rec[6], 'status': rec[7], 'auth': rec[8], 'auths': [], 'images': []}
+                    incident = {'id': rec[0], 'description': rec[1], 'location': rec[2], 'event_type': rec[3], 'dt_reported': str(rec[4]), 'dt_occured': str(rec[5]), 'contact_email': rec[6], 'status': rec[7], 'auth': rec[8], 'auths': [], 'images': [], 'district':rec[10]}
                     images = self.get_incident_image(incident)
                     auths = self.get_incident_auth(incident)
                     feedbacks = self.get_feedbacks(incident)
@@ -99,7 +100,7 @@ class DBUtil():
                 cur.execute(sql, (params['event_id'],params['status_id'],params['auth_id'],))
                 rows = cur.fetchall()
                 for rec in rows:
-                    incident = {'id': rec[0], 'description': rec[1], 'location': rec[2], 'event_type': rec[3], 'dt_reported': str(rec[4]), 'dt_occured': str(rec[5]), 'contact_email': rec[6], 'status': rec[7], 'auths': [], 'images': [], 'feedbacks': []}
+                    incident = {'id': rec[0], 'description': rec[1], 'location': rec[2], 'event_type': rec[3], 'dt_reported': str(rec[4]), 'dt_occured': str(rec[5]), 'contact_email': rec[6], 'status': rec[7], 'auths': [], 'images': [], 'feedbacks': [],'district':rec[10]}
                     images = self.get_incident_image(incident)
                     auths = self.get_incident_auth(incident)
                     feedbacks = self.get_feedbacks(incident)
@@ -120,7 +121,7 @@ class DBUtil():
                 cur.execute(sql, (params['contact_email'],))
                 rows = cur.fetchall()
                 for rec in rows:
-                    incident = {'id': rec[0], 'description': rec[1], 'location': rec[2], 'event_type': rec[3], 'dt_reported': str(rec[4]), 'dt_occured': str(rec[5]), 'contact_email': rec[6], 'status': rec[7], 'auths': [], 'images': [], 'feedbacks':[]}
+                    incident = {'id': rec[0], 'description': rec[1], 'location': rec[2], 'event_type': rec[3], 'dt_reported': str(rec[4]), 'dt_occured': str(rec[5]), 'contact_email': rec[6], 'status': rec[7], 'auths': [], 'images': [], 'feedbacks':[],'district':rec[10]}
                     images = self.get_incident_image(incident)
                     auths = self.get_incident_auth(incident)
                     feedbacks = self.get_feedbacks(incident)
@@ -141,7 +142,7 @@ class DBUtil():
                 cur.execute(sql, (params['status_id'],params['auth_id'],))
                 rows = cur.fetchall()
                 for rec in rows:
-                    incident = {'id': rec[0], 'description': rec[1], 'location': rec[2], 'event_type': rec[3], 'dt_reported': str(rec[4]), 'dt_occured': str(rec[5]), 'contact_email': rec[6], 'status': rec[7], 'auths': [], 'images': [], 'feedbacks': []}
+                    incident = {'id': rec[0], 'description': rec[1], 'location': rec[2], 'event_type': rec[3], 'dt_reported': str(rec[4]), 'dt_occured': str(rec[5]), 'contact_email': rec[6], 'status': rec[7], 'auths': [], 'images': [], 'feedbacks': [],'district':rec[10]}
                     images = self.get_incident_image(incident)
                     auths = self.get_incident_auth(incident)
                     feedbacks = self.get_feedbacks(incident)
@@ -162,7 +163,7 @@ class DBUtil():
                 cur.execute(sql, (params['auth_id'],))
                 rows = cur.fetchall()
                 for rec in rows:
-                    incident = {'id': rec[0], 'description': rec[1], 'location': rec[2], 'event_type': rec[3], 'dt_reported': str(rec[4]), 'dt_occured': str(rec[5]), 'contact_email': rec[6], 'status': rec[7], 'auths': [], 'images': [], 'feedbacks': []}
+                    incident = {'id': rec[0], 'description': rec[1], 'location': rec[2], 'event_type': rec[3], 'dt_reported': str(rec[4]), 'dt_occured': str(rec[5]), 'contact_email': rec[6], 'status': rec[7], 'auths': [], 'images': [], 'feedbacks': [],'district':rec[10]}
                     images = self.get_incident_image(incident)
                     auths = self.get_incident_auth(incident)
                     feedbacks = self.get_feedbacks(incident)
@@ -183,7 +184,7 @@ class DBUtil():
                 cur.execute(sql, (params['auth_id'],params['status_id'],))
                 rows = cur.fetchall()
                 for rec in rows:
-                    incident = {'id': rec[0], 'description': rec[1], 'location': rec[2], 'event_type': rec[3], 'dt_reported': str(rec[4]), 'dt_occured': str(rec[5]), 'contact_email': rec[6], 'status': rec[7], 'auths': [], 'images': [], 'feedbacks': []}
+                    incident = {'id': rec[0], 'description': rec[1], 'location': rec[2], 'event_type': rec[3], 'dt_reported': str(rec[4]), 'dt_occured': str(rec[5]), 'contact_email': rec[6], 'status': rec[7], 'auths': [], 'images': [], 'feedbacks': [],'district':rec[10]}
                     images = self.get_incident_image(incident)
                     auths = self.get_incident_auth(incident)
                     feedbacks = self.get_feedbacks(incident)
