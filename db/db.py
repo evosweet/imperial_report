@@ -68,6 +68,28 @@ class DBUtil():
         except Exception as identifier:
             print identifier, "error"
 
+    def get_wildcard(self, params):
+        try:
+            con = self.connect()
+            sql = self.getConfig('sql')['get_wildcard']
+            incidents = []
+            with con.cursor() as cur:
+                sql = sql.format(params['auth_id'],params['searchType'], params['value'], params['status'])
+                cur.execute(sql)
+                for rec in cur.fetchall():
+                    # incident = {'id': rec[1], 'name': rec[2], 'desc': rec[3], 'email': rec[4], 'person_of_contact': rec[5], 'phone': rec[6], 'address': rec[7], 'website': rec[8]}
+                    incident = {'id': rec[0], 'description': rec[1], 'location': rec[2], 'event_type': rec[3], 'dt_reported': str(rec[4]), 'dt_occured': str(rec[5]), 'contact_email': rec[6], 'status': rec[7], 'auth': rec[8], 'auths': [], 'images': []}
+                    images = self.get_incident_image(incident)
+                    auths = self.get_incident_auth(incident)
+                    feedbacks = self.get_feedbacks(incident)
+                    incident['images'] = images
+                    incident['auths'] = auths
+                    incident['feedbacks'] = feedbacks
+                    incidents.append(incident)
+            return incidents
+        except Exception as identifier:
+            print identifier, "error"
+
     def get_incident_event(self, params):
         try:
             con = self.connect()
