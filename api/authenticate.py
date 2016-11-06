@@ -14,9 +14,8 @@ class Auth():
         try:
             if token is not None:
                 payload = jwt.decode(token,'secret')
-                print 'here we go',payload
                 if payload['auth_level'] >= actionlvl:
-                    response ={"Allow":1,"res":falcon.HTTP_200,"level":payload['auth_level'],"user":payload['user']}
+                    response ={"Allow":1,"res":falcon.HTTP_200,"level":payload['auth_level'],"user":payload['user'],"user_id":payload['user_id']}
                 else:
                     response['res'] = falcon.HTTP_403
                     response['msg'] = "Not Authorized! Please contact an admin about gaining access to this feature."
@@ -39,8 +38,7 @@ class Auth():
     def gettoken(self, req):
         """gets token"""
         token = {'authToken':None}
-        isverified, auth_id = self.db.login(req)
-        print isverified
+        isverified, auth_id, user_id = self.db.login(req)
         # isverified = {'resp':1}
         if isverified == 1:
             if auth_id == 32:
@@ -49,13 +47,12 @@ class Auth():
             else:
                 user_level = 'user'
                 user_lvl = 1
-            token['authToken'] = jwt.encode({'exp':datetime.datetime.utcnow()+datetime.timedelta(seconds=28800), 'auth_id':auth_id,'user':req['username'],'auth_level':user_lvl}, 'secret', algorithm='HS256')
+            token['authToken'] = jwt.encode({'exp':datetime.datetime.utcnow()+datetime.timedelta(seconds=28800), 'auth_id':auth_id,'user':req['username'],'auth_level':user_lvl,'user_id':user_id}, 'secret', algorithm='HS256')
             token['user_level'] = user_level
             token['Result'] = 'SUCCESS'
         else:
             token['msg'] = 'INCORRECT PASSWORD or USERNAME'
             token['Result'] = 'ERROR'
-        print token
         return token
 
 # auth = CSRAuth()

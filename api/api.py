@@ -135,9 +135,7 @@ class GetIncidentInfo(object):
         try:
             data = ast.literal_eval(req.stream.read(req.content_length or 0))
             if data:
-                print data
                 if data['searchType'] == 'id':
-                    print "here"
                     info = DBUtil().get_incident({'id':data['value']})
                 else:
                     info = DBUtil().get_incident_email({'contact_email':data['value']})
@@ -145,7 +143,6 @@ class GetIncidentInfo(object):
                     resp.status = falcon.HTTP_200
                     resp.content_type = CONTENT_TYPE
                     RESP['msg'] = []
-                    print type(RESP['msg'])
                     RESP['msg'] = info
                     RESP['result'] = 'SUCCESS'
                 else:
@@ -157,7 +154,6 @@ class GetIncidentInfo(object):
             RESP['msg'] = identifier.message
             RESP['result'] = 'ERROR'
         finally:
-            print type(RESP['msg'])
             resp.data = json.dumps(RESP)
 
 class GetIncidentByEvent(object):
@@ -261,9 +257,76 @@ class Login(object):
             if data:
                 token = Auth().gettoken(data)
                 resp.status = falcon.HTTP_200
-                RESP = token
+                resp.content_type = CONTENT_TYPE
+                resp.data = json.dumps(token)
         except Exception as identifier:
-            print identifier
+            resp.content_type = CONTENT_TYPE
+            resp.status = falcon.HTTP_400
+            RESP['msg'] = identifier.message
+            RESP['result'] = 'ERROR'
+            resp.data = json.dumps(RESP)
+
+
+class UpdateIncidentStatus(object):
+    def on_post(self,req, resp):
+        """post method"""
+        try:
+            isvalid = Auth().authenticate(req.get_header("authToken"), 1)
+            if isvalid['Allow'] ==1:
+                data = ast.literal_eval(req.stream.read(req.content_length))
+                if data:
+                    if DBUtil().update_incident(data) == 1:
+                        resp.content_type = CONTENT_TYPE
+                        resp.status = falcon.HTTP_200
+                        RESP['msg'] = "INCIDENT STATUS UPDATED"
+                        RESP['result'] = 'SUCCESS'
+                    else:
+                        resp.content_type = CONTENT_TYPE
+                        resp.status = falcon.HTTP_400
+                        RESP['msg'] = "COULD NOT  UPDATE INCIDENT"
+                        RESP['result'] = 'ERROR'
+            else:
+                resp.content_type = CONTENT_TYPE
+                resp.status = isvalid['res']
+                RESP['msg'] = isvalid['msg']
+                RESP['result'] = 'ERROR'
+        except Exception as identifier:
+            resp.content_type = CONTENT_TYPE
+            resp.status = falcon.HTTP_400
+            RESP['msg'] = identifier.message
+            RESP['result'] = 'ERROR'
+        finally:
+            resp.data = json.dumps(RESP)
+
+class AddFeedback(object):
+    def on_post(self,req, resp):
+        """post method"""
+        try:
+            isvalid = Auth().authenticate(req.get_header("authToken"), 1)
+            if isvalid['Allow'] ==1:
+                data = ast.literal_eval(req.stream.read(req.content_length))
+                if data:
+                    data['user_id'] = isvalid['user_id']
+                    if DBUtil().add_feedback(data):
+                        resp.content_type = CONTENT_TYPE
+                        resp.status = falcon.HTTP_200
+                        RESP['msg'] = "Feedback added successfully"
+                        RESP['result'] = 'SUCCESS'
+                    else:
+                        resp.content_type = CONTENT_TYPE
+                        resp.status = falcon.HTTP_400
+                        RESP['msg'] = "COULD NOT  ADD FEEDBACK"
+                        RESP['result'] = 'ERROR'
+            else:
+                resp.content_type = CONTENT_TYPE
+                resp.status = isvalid['res']
+                RESP['msg'] = isvalid['msg']
+                RESP['result'] = 'ERROR'
+        except Exception as identifier:
+            resp.content_type = CONTENT_TYPE
+            resp.status = falcon.HTTP_400
+            RESP['msg'] = identifier.message
+            RESP['result'] = 'ERROR'
         finally:
             resp.data = json.dumps(RESP)
 
