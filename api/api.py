@@ -157,31 +157,41 @@ class GetIncidentInfo(object):
             resp.data = json.dumps(RESP)
 
 class GetIncidentByEvent(object):
+
     def on_post(self, req, resp):
-        try:
-            data = ast.literal_eval(req.stream.read(req.content_length or 0))
-            if data:
-                info = DBUtil().get_incident_event(data)
-                print info
-                if info:
-                    resp.status = falcon.HTTP_200
-                    resp.content_type = CONTENT_TYPE
-                    RESP['msg'] = []
-                    RESP['msg'] = info
-                    RESP['result'] = 'SUCCESS'
+         try:
+            isvalid = Auth().authenticate(req.get_header("authToken"), 1)
+            if isvalid['Allow'] ==1:
+                data = ast.literal_eval(req.stream.read(req.content_length or 0))
+                if data:
+                    data['auth_id'] = isvalid['auth_id']
+                    info = DBUtil().get_wildcard(data)
+                    if info:
+                        resp.status = falcon.HTTP_200
+                        resp.content_type = CONTENT_TYPE
+                        RESP['msg'] = []
+                        RESP['msg'] = info
+                        RESP['result'] = 'SUCCESS'
+                    else:
+                        resp.status = falcon.HTTP_200
+                        RESP['msg'] = 'No Incidents Found with that Criterior'
+                        RESP['result'] = 'ERROR'      
                 else:
-                    resp.status = falcon.HTTP_200
-                    RESP['msg'] = 'No Incidents Found with that Number'
+                    resp.content_type = CONTENT_TYPE
+                    resp.status = falcon.HTTP_400
+                    RESP['msg'] = "Please send a parameter"
                     RESP['result'] = 'ERROR'
             else:
-                resp.status = falcon.HTTP_400
-                RESP['msg'] = 'Not enough Arguments passed'
+                resp.content_type = CONTENT_TYPE
+                resp.status = isvalid['res']
+                RESP['msg'] = isvalid['msg']
                 RESP['result'] = 'ERROR'
-        except Exception as identifier:
-            resp.status = falcon.HTTP_500
+         except Exception as identifier:
+            resp.content_type = CONTENT_TYPE
+            resp.status = falcon.HTTP_400
             RESP['msg'] = identifier.message
             RESP['result'] = 'ERROR'
-        finally:
+         finally:
             resp.data = json.dumps(RESP)
 
 class GetIncidentByAuth(object):
@@ -329,5 +339,6 @@ class AddFeedback(object):
             RESP['result'] = 'ERROR'
         finally:
             resp.data = json.dumps(RESP)
+            
 
 

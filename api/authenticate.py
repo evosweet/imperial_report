@@ -15,7 +15,7 @@ class Auth():
             if token is not None:
                 payload = jwt.decode(token,'secret')
                 if payload['auth_level'] >= actionlvl:
-                    response ={"Allow":1,"res":falcon.HTTP_200,"level":payload['auth_level'],"user":payload['user'],"user_id":payload['user_id']}
+                    response ={"Allow":1,"res":falcon.HTTP_200,"level":payload['auth_level'],"user":payload['user'],"user_id":payload['user_id'],"auth_id":payload['auth_id']}
                 else:
                     response['res'] = falcon.HTTP_403
                     response['msg'] = "Not Authorized! Please contact an admin about gaining access to this feature."
