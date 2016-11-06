@@ -350,3 +350,20 @@ class DBUtil():
             return self.check_pw(params['pw'], pw), rec[1], rec[2]
         except Exception as identifier:
             print identifier, "error"
+
+
+    def incident_summary_auth(self, params):
+        try:
+            con = self.connect()
+            sql = self.getConfig('sql')['incident_summary_auth']
+            output = []
+            with con.cursor() as cur:
+                cur.execute(sql, (params['auth_id'],))
+                rows = cur.fetchall()
+                for rec in rows:
+                    out = {'total_incidents': rec[0], 'event_type': rec[1], 'status': rec[2]}
+
+                    output.append(out)
+            return output
+        except Exception as identifier:
+            print identifier, "error"
