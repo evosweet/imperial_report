@@ -220,23 +220,18 @@ class CreateUser(object):
         """post method"""
         try:
             isvalid = Auth().authenticate(req.get_header("authToken"), 2)
-            print isvalid
             if isvalid['Allow'] == 1:
-                print "here"
                 data = ast.literal_eval(req.stream.read(req.content_length or 0))
-                print data
                 if data:
                     pw = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(10))
-                    print pw
-                    params = {'username':data['username'], 'pw':pw,'level':'user', 'created_by':isvalid['user'], 'dt_created':str(datetime.datetime.now()), 'auth_id':data['auth_id']}
-                    print params
+                    params = {'username':data['username'], 'pw':pw, 'level':'user', 'created_by':isvalid['user'], 'dt_created':str(datetime.datetime.now()), 'auth_id':data['auth_id']}
                     if DBUtil().add_user(params):
                         resp.content_type = CONTENT_TYPE
                         resp.status = falcon.HTTP_200
                         RESP['msg'] = "GOOD"
                         RESP['result'] = 'SUCCESS'
                         try:
-                            r = requests.post(URL,json={'pw':pw, 'user':email},timeout=0.01)
+                            r = requests.post(URL, json={'pw':pw, 'user':data['username']}, timeout=0.01)
                         except Exception as identifier:
                             pass
                     else:
