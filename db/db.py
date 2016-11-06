@@ -74,7 +74,7 @@ class DBUtil():
             sql = self.getConfig('sql')['get_incident_by_event']
             incidents = []
             with con.cursor() as cur:
-                cur.execute(sql, (params['event_id'],params['status_id'],))
+                cur.execute(sql, (params['event_id'],params['status_id'],params['auth_id'],))
                 rows = cur.fetchall()
                 for rec in rows:
                     incident = {'id': rec[0], 'description': rec[1], 'location': rec[2], 'event_type': rec[3], 'dt_reported': str(rec[4]), 'dt_occured': str(rec[5]), 'contact_email': rec[6], 'status': rec[7], 'auths': [], 'images': [], 'feedbacks': []}
@@ -116,7 +116,49 @@ class DBUtil():
             sql = self.getConfig('sql')['get_incident_by_status']
             incidents = []
             with con.cursor() as cur:
-                cur.execute(sql, (params['status_id'],))
+                cur.execute(sql, (params['status_id'],params['auth_id'],))
+                rows = cur.fetchall()
+                for rec in rows:
+                    incident = {'id': rec[0], 'description': rec[1], 'location': rec[2], 'event_type': rec[3], 'dt_reported': str(rec[4]), 'dt_occured': str(rec[5]), 'contact_email': rec[6], 'status': rec[7], 'auths': [], 'images': [], 'feedbacks': []}
+                    images = self.get_incident_image(incident)
+                    auths = self.get_incident_auth(incident)
+                    feedbacks = self.get_feedbacks(incident)
+                    incident['images'] = images
+                    incident['auths'] = auths
+                    incident['feedbacks'] = feedbacks
+                    incidents.append(incident)
+            return incidents
+        except Exception as identifier:
+            print identifier, "error"
+
+    def get_incident_by_auth(self, params):
+        try:
+            con = self.connect()
+            sql = self.getConfig('sql')['get_incident_by_auth']
+            incidents = []
+            with con.cursor() as cur:
+                cur.execute(sql, (params['auth_id'],))
+                rows = cur.fetchall()
+                for rec in rows:
+                    incident = {'id': rec[0], 'description': rec[1], 'location': rec[2], 'event_type': rec[3], 'dt_reported': str(rec[4]), 'dt_occured': str(rec[5]), 'contact_email': rec[6], 'status': rec[7], 'auths': [], 'images': [], 'feedbacks': []}
+                    images = self.get_incident_image(incident)
+                    auths = self.get_incident_auth(incident)
+                    feedbacks = self.get_feedbacks(incident)
+                    incident['images'] = images
+                    incident['auths'] = auths
+                    incident['feedbacks'] = feedbacks
+                    incidents.append(incident)
+            return incidents
+        except Exception as identifier:
+            print identifier, "error"
+
+    def get_incident_by_auth_status(self, params):
+        try:
+            con = self.connect()
+            sql = self.getConfig('sql')['get_incident_by_auth_status']
+            incidents = []
+            with con.cursor() as cur:
+                cur.execute(sql, (params['auth_id'],params['status_id'],))
                 rows = cur.fetchall()
                 for rec in rows:
                     incident = {'id': rec[0], 'description': rec[1], 'location': rec[2], 'event_type': rec[3], 'dt_reported': str(rec[4]), 'dt_occured': str(rec[5]), 'contact_email': rec[6], 'status': rec[7], 'auths': [], 'images': [], 'feedbacks': []}
@@ -248,21 +290,9 @@ class DBUtil():
     def add_user(self, params):
         try:
             params['pw'] = self.hash_pw(params['pw'])
-            print params['pw']
             con = self.connect()
             sql = self.getConfig('sql')['add_user']
             params['dt_created'] = datetime.datetime.now()
-            print "endling"
-
-            # if 'dt_occured' not in params:
-            #     params['dt_occured'] = dt_reported
-            # if 'contact_no' not in params:
-            #     params['contact_no'] = None
-            # if 'path' not in params:
-            #     params['path'] = None
-            # if 'email' not in params:
-            #     params['email'] = None
-
             with con.cursor() as cur:
                 cur.execute(sql, (params['username'], params['pw'], params['level'], params['created_by'], params['dt_created'], params['auth_id'],))
                 user_id = con.insert_id()
@@ -274,21 +304,9 @@ class DBUtil():
     def edit_user(self, params):
         try:
             params['pw'] = self.hash_pw(params['pw'])
-            print params['pw']
             con = self.connect()
             sql = self.getConfig('sql')['add_user']
             params['dt_created'] = datetime.datetime.now()
-            print "endling"
-
-            # if 'dt_occured' not in params:
-            #     params['dt_occured'] = dt_reported
-            # if 'contact_no' not in params:
-            #     params['contact_no'] = None
-            # if 'path' not in params:
-            #     params['path'] = None
-            # if 'email' not in params:
-            #     params['email'] = None
-
             with con.cursor() as cur:
                 cur.execute(sql, (params['username'], params['pw'], params['level'], params['created_by'], params['dt_created'], params['auth_id'],))
                 user_id = con.insert_id()
