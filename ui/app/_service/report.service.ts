@@ -12,6 +12,15 @@ export class ReportService {
     private report_url =  'http://lloyd-asus:8041'; // set url 
 
     constructor (private http: Http) {}
+    createUser(username: string, authType: number): Promise <any> {
+        let headers = new Headers({'Content-Type': 'application/json', 'authToken': JSON.parse(localStorage.getItem('currentUser')).token});
+        let body = JSON.stringify({'username': username, 'auth_id': authType})
+        return this.http.post(this.report_url + '/create_user', body, {headers: headers})
+         .toPromise()
+         .then(this.extractData)
+         .catch(this.handleError);
+
+    }
 
     makeReport(event: number, location: string, description: string, phone?: string, 
                email?: string, reportDate?: string): Promise <any> {
