@@ -298,8 +298,9 @@ class DBUtil():
             with con.cursor() as cur:
                 cur.execute(sql, (params['id'],))
                 for rec in cur.fetchall():
-                    feedback = {'id': rec[0], 'incident_id': rec[1], 'comment': rec[2], 'dt': str(rec[3]), 'user': rec[4]}
-                    feedbacks.append(feedback)
+                    # feedback = {'id': rec[0], 'incident_id': rec[1], 'comment': rec[2], 'dt': str(rec[3]), 'user': rec[4]}
+                    
+                    feedbacks.append({'comment':rec[2]})
             return feedbacks
         except Exception as identifier:
             print identifier, "error"

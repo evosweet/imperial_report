@@ -5,11 +5,13 @@ import mimetypes
 from authenticate import Auth
 sys.path.append('..')
 from db.db import DBUtil
-from smtp.smtp import SendMail
+# from smtp.smtp import SendToAuths, SendToUser, SendToCITIZEN
 
 CONTENT_TYPE = 'application/json'
 RESP = {'msg':'','result': ''}
-URL = "http://localhost:8042"
+CITURL = "http://localhost:8042/cit"
+AUTHURL = "http://localhost:8042/auths"
+USERURL = "http://localhost:8042/user"
 
 
 class Index(object):
@@ -30,14 +32,14 @@ class CreateIncident(object):
     """creates incidents"""
     def sendCitzen(self,id,email,type):
         try:
-             r = requests.post(URL,json={'id':id, 'email':email, 'type':type},timeout=0.01)
+             r = requests.post(CITURL,json={'id':id, 'email':email, 'type':type},timeout=0.01)
         except Exception as identifier:
             pass
        
     
     def sendAuth(self,id,email,type):
         try:
-            r = requests.post(URL,json={'id':id, '_to':email, 'type':type},timeout=0.01)
+            r = requests.post(AUTHURL,json={'id':id, 'auths':email, 'type':type},timeout=0.01)
         except Exception as identifier:
             pass
     
@@ -46,6 +48,8 @@ class CreateIncident(object):
         try:
             data = ast.literal_eval(req.stream.read(req.content_length or 0))
             if data:
+                if "district_id" not in data:
+                    data['district_id'] = random.randint(3,70)
                 report_id = DBUtil().add_incident(data)
                 if report_id:
                     resp.status = falcon.HTTP_200
@@ -237,7 +241,7 @@ class CreateUser(object):
                         RESP['msg'] = "GOOD"
                         RESP['result'] = 'SUCCESS'
                         try:
-                            r = requests.post(URL, json={'pw':pw, 'user':data['username']}, timeout=0.01)
+                            r = requests.post(USERURL, json={'pw':pw, 'user':data['username']}, timeout=5)
                         except Exception as identifier:
                             pass
                     else:
@@ -340,5 +344,34 @@ class AddFeedback(object):
         finally:
             resp.data = json.dumps(RESP)
             
-
+class GetIncidentByDistrict(object):
+    def on_post(self, req, resp):
+        """post method"""
+        try:
+            isvalid = Auth().authenticate(req.get_header("authToken"), 1)
+            if isvalid['Allow'] == 1:
+                info = DBUtil().incident_summary_auth(isvalid)
+                if info:
+                    resp.status = falcon.HTTP_200
+                    resp.content_type = CONTENT_TYPE
+                    RESP['msg'] = []
+                    RESP['msg'] = info
+                    RESP['result'] = 'SUCCESS'
+                else:
+                    resp.content_type = CONTENT_TYPE
+                    resp.status = falcon.HTTP_200
+                    RESP['msg'] = 'No Incidents Found with that Number'
+                    RESP['result'] = 'ERROR'
+            else:
+                resp.content_type = CONTENT_TYPE
+                resp.status = isvalid['res']
+                RESP['msg'] = isvalid['msg']
+                RESP['result'] = 'ERROR'
+        except Exception as identifier:
+            resp.content_type = CONTENT_TYPE
+            resp.status = falcon.HTTP_400
+            RESP['msg'] = identifier.message
+            RESP['result'] = 'ERROR'
+        finally:
+            resp.data = json.dumps(RESP)
 
