@@ -1,4 +1,4 @@
-import falcon,ast,datetime
+import falcon,ast,datetime,yagmail
 from falcon_cors import CORS
 import smtplib,uuid,time
 import socket,json,Queue,threading
@@ -8,7 +8,7 @@ from email.MIMEText import MIMEText
 CORZ = CORS(allow_all_origins=True, allow_all_methods=True, allow_all_headers=True)
 API = falcon.API(middleware=[CORZ.middleware])
 
-
+MAIL = yagmail.SMTP({'guytestgov@gmail.com':'GuyGovTest'}, 'uS4BCha5UgMxy78Y')
 
 
 class SendToUser(object):
@@ -18,7 +18,7 @@ class SendToUser(object):
         self.PASS = 'uS4BCha5UgMxy78Y'
         self.msg = MIMEMultipart('alternative')
         self.msg['From'] = self.LOGIN
-        self.msg['subject']  = "An incident has been reported"
+        self.msg['subject']  = "Your CIRS Account has been created"
         self.user="""
         <html>
             <head>
@@ -48,22 +48,8 @@ class SendToUser(object):
         try:
             data = ast.literal_eval(req.stream.read(req.content_length or 0))
             if data:
-                self.msg['subject']  = "Your CIRS Account has been created"
-                recipients = data['user']
-                self.msg['To'] = data['user']
                 body = self.user % (data['user'], data['pw'])
-                print body
-                self.msg.attach(MIMEText(body,'html'))
-                mailserver = smtplib.SMTP('smtp.gmail.com', 587)
-                # identify ourselves to smtp gmail client
-                mailserver.ehlo()
-                # secure our email with tls encryption
-                mailserver.starttls()
-                # re-identify ourselves as an encrypted connection
-                mailserver.ehlo()
-                mailserver.login(self.LOGIN, self.PASS)
-                mailserver.sendmail(self.LOGIN, recipients, self.msg.as_string())
-                mailserver.quit()
+                MAIL.send(data['user'], self.msg['subject'], body)
             resp.status = falcon.HTTP_200
         except Exception as identifier:
             print  identifier
@@ -107,20 +93,8 @@ class SendToAuths(object):
         try:
             data = ast.literal_eval(req.stream.read(req.content_length or 0))
             if data:
-                recipients = data['auths']
-                self.msg['To'] = ", ".join(data['auths'])
-                body = self.auth % (data['type'],data['id'])
-                self.msg.attach(MIMEText(body,'html'))
-                mailserver = smtplib.SMTP('smtp.gmail.com', 587)
-                # identify ourselves to smtp gmail client
-                mailserver.ehlo()
-                # secure our email with tls encryption
-                mailserver.starttls()
-                # re-identify ourselves as an encrypted connection
-                mailserver.ehlo()
-                mailserver.login(self.LOGIN, self.PASS)
-                mailserver.sendmail(self.LOGIN, recipients, self.msg.as_string())
-                mailserver.quit()
+                body = self.auth % (data['type'], data['id'])
+                MAIL.send(data['auths'], self.msg['subject'], body)
             resp.status = falcon.HTTP_200
         except Exception as identifier:
             print  identifier
@@ -169,17 +143,7 @@ class SendToCITIZEN(object):
                 recipients = data['email']
                 self.msg['To'] = data['email']
                 body = self.citizen % (data['email'], data['type'], data['id'])
-                self.msg.attach(MIMEText(body,'html'))
-                mailserver = smtplib.SMTP('smtp.gmail.com', 587)
-                # identify ourselves to smtp gmail client
-                mailserver.ehlo()
-                # secure our email with tls encryption
-                mailserver.starttls()
-                # re-identify ourselves as an encrypted connection
-                mailserver.ehlo()
-                mailserver.login(self.LOGIN, self.PASS)
-                mailserver.sendmail(self.LOGIN, recipients, self.msg.as_string())
-                mailserver.quit()
+                MAIL.send(data['email'], self.msg['subject'], body)
             resp.status = falcon.HTTP_200
         except Exception as identifier:
             print  identifier
