@@ -62,11 +62,13 @@
                 </div>
             </div>
             <div class="row" *ngIf="singleReport.feedbacks.length > 0">
-
+                <ul class="list-group">
+                     <h6><li class="list-group-item" *ngFor="let feedback of singleReport.feedbacks"> Comment : {{ feedback.comment }}</li></h6>
+                </ul>
             </div>
             <div class="row" *ngIf="singleReport.auths.length > 0">
                 <ul class="list-group">
-                     <h6><li class="list-group-item" *ngFor="let auth of singleReport.auths">{{ auth.auth }}</li></h6>
+                     <h6><li class="list-group-item" *ngFor="let auth of singleReport.auths"> Agency : {{ auth.auth }}</li></h6>
                 </ul>
             </div>
     </div>

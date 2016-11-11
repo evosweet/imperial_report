@@ -79,6 +79,7 @@ export class EditComponent {
             if (result.result === 'ERROR') {
                this.errorView = true;
             } else {
+                this.model.feedback = '';
                 this.returnUpdate = result.msg;
             }
         });

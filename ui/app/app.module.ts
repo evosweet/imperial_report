@@ -2,6 +2,7 @@ import { NgModule }      from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
+import { enableProdMode } from '@angular/core';
 
 import { AppComponent }  from './app.component';
 import { HomeComponent } from './component/home.component';
@@ -18,6 +19,8 @@ import { ReportService } from './_service/report.service';
 import { AuthGuard } from './_guard/auth.guard';
 import {  AuthenticationService } from './_service/authentication.service';
 
+enableProdMode()
+
 @NgModule({
   imports:      [ BrowserModule, AppRoutingModule, FormsModule, HttpModule],
   declarations: [ AppComponent, routingComponents , HomeComponent,
@@ -26,4 +29,5 @@ import {  AuthenticationService } from './_service/authentication.service';
   providers: [ ReportService, AuthGuard, AuthenticationService ],
   bootstrap:    [ AppComponent ]
 })
-export class AppModule { }
+export class AppModule {
+}
